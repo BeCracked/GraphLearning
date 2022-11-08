@@ -13,7 +13,7 @@ l: maximum length of closed walks
 return: feature vector with shape (1, l+1) as numpy array
 """
 def closed_walk_kernel(G, l):
-    A = nx.adjacency_matrix(G)
+    A = nx.to_numpy_matrix(G)
     # A_exp holds adjacency matrix exponentiated with i (start with exponent 0 which is identity matrix)
     A_exp = np.identity(len(G.nodes))
 
