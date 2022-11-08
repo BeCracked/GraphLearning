@@ -18,7 +18,7 @@ def graphlet_kernel(G, seed=12345):
         # sample 5 nodes to obtain sample graph
         node_sample = random.sample(G.nodes, 5)
         graph_sample = G.subgraph(node_sample)
-        # check which graphlet
+        # check to which graphlet the sampled graph is isomorphic to
         for j in range(34):
             if nx.is_isomorphic(graph_sample, graphlets_list[j]):
                 feature_vector[0, j] += 1
