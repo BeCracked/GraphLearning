@@ -3,7 +3,7 @@ import random
 import networkx as nx
 import numpy as np
 
-import graphlets
+from .graphlets import get_all_graphlets
 
 """
 G: networkx graph
@@ -14,7 +14,7 @@ return: feature vector with shape (1, 34) as numpy array
 
 def graphlet_kernel(G, seed=12345):
     random.seed(seed)
-    graphlets_list = graphlets.get_all_graphlets()
+    graphlets_list = get_all_graphlets()
 
     # compute histogram that holds how often graphlet occurs (repeat 1000 times)
     feature_vector = np.zeros((1, 34))

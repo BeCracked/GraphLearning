@@ -1,6 +1,8 @@
 import argparse as ap
 
 from Kernels.wl_kernel import wl_kernel, print_feature_vectors
+from Kernels.closed_walk_kernel import closed_walk_kernel
+from Kernels.graphlet_kernel import graphlet_kernel
 from helper.matrix_io import from_adj_str
 
 
@@ -21,12 +23,21 @@ def run_kernel():
     match args.kernel:
         case "closed_walk":
             if not args.quiet:
-                print(f"Executing WL kernel on {len(graphs)} graphs...")
+                print(f"Executing closed walk kernel on {len(graphs)} graphs...")
+            # TODO: need to decide l
+            feature_vector = closed_walk_kernel(graphs, 10)
+            if not args.quiet:
+                print(f"{args.kernel} gave the following feature vector:")
+            print(feature_vector)
             return
 
         case "graphlet":
             if not args.quiet:
-                print(f"Executing WL kernel on {len(graphs)} graphs...")
+                print(f"Executing graphlets kernel on {len(graphs)} graphs...")
+            feature_vector = graphlet_kernel(graphs)
+            if not args.quiet:
+                print(f"{args.kernel} gave the following feature vector:")
+            print(feature_vector)
             return
 
         case "WL":
