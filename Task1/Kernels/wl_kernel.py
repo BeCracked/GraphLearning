@@ -1,10 +1,11 @@
 import copy
-import networkx as nx
-from scipy.sparse import csr_matrix
-from multiset import Multiset
-import matplotlib.pyplot as plt
 from hashlib import sha256
 from typing import Tuple, Dict, List
+
+import matplotlib.pyplot as plt
+import networkx as nx
+from multiset import Multiset
+from scipy.sparse import csr_matrix
 
 
 class InjectiveHash:

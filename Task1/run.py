@@ -1,11 +1,7 @@
-import scipy.sparse
-
-from helper.matrix_io import from_adj_str
-import networkx as nx
-import numpy as np
-import matplotlib.pyplot as plt
 import argparse as ap
+
 from Kernels.wl_kernel import wl_kernel, print_feature_vectors
+from helper.matrix_io import from_adj_str
 
 
 def run_kernel():
@@ -22,7 +18,6 @@ def run_kernel():
     for g_str in args.graphs:
         graphs.append(from_adj_str(g_str))
 
-    feature_vectors = []
     match args.kernel:
         case "closed_walk":
             if not args.quiet:
@@ -49,18 +44,3 @@ def run_kernel():
 
 if __name__ == '__main__':
     run_kernel()
-
-'''    s1 = """
-    [
-    [0,1,1,0,0],
-    [0,0,1,0,0],
-    [0,0,0,1,0],
-    [0,0,0,0,1],
-    [0,0,0,0,0]
-    ]
-    """
-    g1 = from_adj_str(s1)
-
-    f_vec = wl_kernel(4, g1, plot_steps=True)
-    print(f_vec)
-'''

@@ -1,6 +1,7 @@
+import json
+
 import networkx as nx
 import numpy as np
-import json
 
 
 def from_adj_str(adj_s: str, node_labels=None) -> nx.Graph:

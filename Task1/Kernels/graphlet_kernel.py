@@ -1,6 +1,8 @@
 import random
+
 import networkx as nx
 import numpy as np
+
 import graphlets
 
 """
@@ -8,6 +10,8 @@ G: networkx graph
 seed: seed for random sampling
 return: feature vector with shape (1, 34) as numpy array
 """
+
+
 def graphlet_kernel(G, seed=12345):
     random.seed(seed)
     graphlets_list = graphlets.get_all_graphlets()
