@@ -1,6 +1,7 @@
 import copy
 import networkx as nx
 import numpy as np
+from scipy.sparse import csr_matrix
 from multiset import Multiset
 import matplotlib.pyplot as plt
 from hashlib import sha256
@@ -23,7 +24,7 @@ class InjectiveHash:
         return self.hash_table[s]
 
 
-def wl_kernel(k: int, *g: nx.Graph | Tuple[nx.Graph], plot_steps=False) -> Dict[int, np.array]:
+def wl_kernel(k: int, *g: nx.Graph | Tuple[nx.Graph] | List[nx.Graph], plot_steps=False) -> list[csr_matrix]:
     graphs: List[nx.Graph] = copy.deepcopy([*g])  # Copy all graphs as we will modify them during the steps
     feature_vectors = {}
     # Init histogram vectors for each graph, accessible with ids
@@ -58,16 +59,21 @@ def wl_kernel(k: int, *g: nx.Graph | Tuple[nx.Graph], plot_steps=False) -> Dict[
             color_counts[node[1]] += 1
         feature_vectors[gi].extend([color_counts[color] for color in list(sorted(color_counts.keys()))])
 
+    # Execute steps
     for i in range(0, k):
         # Append histogram vectors for current step
         for gi in range(len(graphs)):
             step_vector = _perform_coloring_step(graphs, hash_func, plot_step=plot_steps)
             feature_vectors[gi].extend(step_vector[gi])
 
-    # Transform feature vectors to sparse numpy vectors
-    ...
+    # Transform feature vectors to sparse
+    spare_feature_vectors = []
+    for i in range(len(feature_vectors)):
+        list_vector = feature_vectors[i]
+        vector = csr_matrix(list_vector, shape=(1, len(list_vector)))
+        spare_feature_vectors.append(vector)
 
-    return feature_vectors
+    return spare_feature_vectors
 
 
 def _perform_coloring_step(graphs: List[nx.Graph], hash_func: InjectiveHash, *, plot_step: bool = False)\
@@ -171,4 +177,9 @@ if __name__ == '__main__':
 
     G5 = get_random_graph(123146)
 
-    print(wl_kernel(4, G1, G2, G5, plot_steps=True), sep="\n")
+    vectors = wl_kernel(4, G1, G2, G5, plot_steps=False)
+
+    for i in range(len(vectors)):
+        print(f"G{i+1} feature vector:")
+        print(vectors[i])
+
