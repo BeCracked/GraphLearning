@@ -1,6 +1,5 @@
 import copy
 import networkx as nx
-import numpy as np
 from scipy.sparse import csr_matrix
 from multiset import Multiset
 import matplotlib.pyplot as plt
@@ -24,8 +23,8 @@ class InjectiveHash:
         return self.hash_table[s]
 
 
-def wl_kernel(k: int, *g: nx.Graph | Tuple[nx.Graph] | List[nx.Graph], plot_steps=False) -> list[csr_matrix]:
-    graphs: List[nx.Graph] = copy.deepcopy([*g])  # Copy all graphs as we will modify them during the steps
+def wl_kernel(k: int, g: List[nx.Graph], *, plot_steps=False) -> list[csr_matrix]:
+    graphs: List[nx.Graph] = copy.deepcopy(g)  # Copy all graphs as we will modify them during the steps
     feature_vectors = {}
     # Init histogram vectors for each graph, accessible with ids
     for gi in range(len(graphs)):
@@ -70,13 +69,13 @@ def wl_kernel(k: int, *g: nx.Graph | Tuple[nx.Graph] | List[nx.Graph], plot_step
     spare_feature_vectors = []
     for i in range(len(feature_vectors)):
         list_vector = feature_vectors[i]
-        vector = csr_matrix(list_vector, shape=(1, len(list_vector)))
+        vector = csr_matrix(list_vector, shape=(1, len(list_vector))).transpose()
         spare_feature_vectors.append(vector)
 
     return spare_feature_vectors
 
 
-def _perform_coloring_step(graphs: List[nx.Graph], hash_func: InjectiveHash, *, plot_step: bool = False)\
+def _perform_coloring_step(graphs: List[nx.Graph], hash_func: InjectiveHash, *, plot_step: bool = False) \
         -> Dict[int, List[int]]:
     """
 
@@ -95,7 +94,6 @@ def _perform_coloring_step(graphs: List[nx.Graph], hash_func: InjectiveHash, *, 
 
             # Get color hash
             color_id = hash_func.get_hash(hash_string)
-            #print(f"{node}:{hash_string}->{color_id}")
             unique_colors.add(color_id)
             color_mapping[node] = {"color_id": color_id, "color": _hash_to_color(str(color_id))}
         # Update information on graphs
@@ -116,13 +114,6 @@ def _perform_coloring_step(graphs: List[nx.Graph], hash_func: InjectiveHash, *, 
             show_colored_graph(graph)
 
     return feature_vectors
-
-
-def show_colored_graph(graph: nx.Graph) -> None:
-    node_colors = [tuple(ti / 256 for ti in color) for node, color in graph.nodes("color")]
-    label_mapping = {node: color_id for node, color_id in graph.nodes("color_id")}
-    nx.draw_networkx(graph, pos=nx.planar_layout(graph), node_size=800, node_color=node_colors, labels=label_mapping)
-    plt.show()
 
 
 def _hash_to_color(s: str) -> Tuple[int, int, int]:
@@ -169,6 +160,33 @@ def t_hash():
     print({col: count for col, count in hash_counts.items() if count > 1})
 
 
+def print_feature_vectors(feature_vectors: List[csr_matrix]):
+    # c_id G0  G1
+    # 0     5   5
+    # 1     3   2
+    # 2     1   1
+    # 3     1   1
+    # 4     2   1
+
+    vec_range = range(0, feature_vectors[0].get_shape()[0])
+    print(f"c_id ", end="")
+    for i in range(len(feature_vectors)):
+        print(f"G{i: <3}", end="")
+    print()
+    for j in vec_range:
+        print(f"{j: <3}", end="")
+        for vector in feature_vectors:
+            print(f"{vector.getrow(j).toarray()[0][0]: 4}", end="")
+        print()
+
+
+def show_colored_graph(graph: nx.Graph) -> None:
+    node_colors = [tuple(ti / 256 for ti in color) for node, color in graph.nodes("color")]
+    label_mapping = {node: color_id for node, color_id in graph.nodes("color_id")}
+    nx.draw_networkx(graph, pos=nx.planar_layout(graph), node_size=800, node_color=node_colors, labels=label_mapping)
+    plt.show()
+
+
 if __name__ == '__main__':
     from Task1.helper.graph_gen import get_random_graph
 
@@ -177,9 +195,8 @@ if __name__ == '__main__':
 
     G5 = get_random_graph(123146)
 
-    vectors = wl_kernel(4, G1, G2, G5, plot_steps=False)
+    vectors = wl_kernel(4, [G1, G2, G5], plot_steps=False)
 
-    for i in range(len(vectors)):
-        print(f"G{i+1} feature vector:")
-        print(vectors[i])
-
+    for r in range(len(vectors)):
+        print(f"G{r + 1} feature vector:")
+        print(vectors[r])
