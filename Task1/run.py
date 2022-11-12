@@ -24,20 +24,26 @@ def run_kernel():
         case "closed_walk":
             if not args.quiet:
                 print(f"Executing closed walk kernel on {len(graphs)} graphs...")
-            # TODO: need to decide l
-            feature_vector = closed_walk_kernel(graphs, 10)
+            feature_vectors = []
+            for graph in graphs:
+                # TODO: need to decide l
+                feature_vectors.append(closed_walk_kernel(graph, 10))
             if not args.quiet:
-                print(f"{args.kernel} gave the following feature vector:")
-            print(feature_vector)
+                print(f"{args.kernel} gave the following feature vectors:")
+            for vector in feature_vectors:
+                print(vector)
             return
 
         case "graphlet":
             if not args.quiet:
                 print(f"Executing graphlets kernel on {len(graphs)} graphs...")
-            feature_vector = graphlet_kernel(graphs)
+            feature_vectors = []
+            for graph in graphs:
+                feature_vectors.append(graphlet_kernel(graph))
             if not args.quiet:
-                print(f"{args.kernel} gave the following feature vector:")
-            print(feature_vector)
+                print(f"{args.kernel} gave the following feature vectors:")
+            for vector in feature_vectors:
+                print(vector)
             return
 
         case "WL":
