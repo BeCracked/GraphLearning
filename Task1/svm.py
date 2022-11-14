@@ -44,7 +44,10 @@ def compute_gram_matrix(kern: callable, graph_dataset):
     print(f"Calculating {len(graph_dataset)} feature vectors...")
     kern_start = time.perf_counter()
     feature_vectors = kern(*graph_dataset)
-    feature_vectors = [fv / np.sqrt(np.sum(fv ** 2)) for fv in feature_vectors]  # Normalize
+    if not isinstance(feature_vectors[0], np.ndarray):
+        feature_vectors = [fv / np.sqrt(fv.transpose().dot(fv).toarray()[0][0]) for fv in feature_vectors]  # Normalize
+    else:
+        feature_vectors = [fv / np.sqrt(fv.transpose().dot(fv)[0][0]) for fv in feature_vectors]  # Normalize
     kern_end = time.perf_counter()
     print(f"Calculated feature vectors in {kern_end - kern_start:.4f}s")
 
@@ -96,7 +99,11 @@ def compute_gram_row_chunk(feature_vectors: list, i: int,
     for j in range(j_min, j_max):
         fv_2: csr_matrix = feature_vectors[j]
         d = fv_1 - fv_2
-        dist = d.transpose().dot(d).toarray()[0][0]
+        if not isinstance(d, np.ndarray):
+            dist = d.transpose().dot(d).toarray()[0][0]
+        else:
+            dist = d.transpose().dot(d)[0][0]
+
         gram_row[j] = dist
 
     return i, gram_row
@@ -166,4 +173,8 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"], dataset: Literal["DD", "
 
 
 if __name__ == '__main__':
-    fit("closed_walk", "DD")
+    kernels = ["closed_walk", "graphlet", "WL"]
+    datasets = ["DD", "Enzymes", "NCI"]
+    for kernel in kernels:
+        fit(kernel, "Enzymes")
+
