@@ -44,6 +44,7 @@ def compute_gram_matrix(kern: callable, graph_dataset):
     print(f"Calculating {len(graph_dataset)} feature vectors...")
     kern_start = time.perf_counter()
     feature_vectors = kern(*graph_dataset)
+    feature_vectors = [fv / np.sqrt(np.sum(fv ** 2)) for fv in feature_vectors]  # Normalize
     kern_end = time.perf_counter()
     print(f"Calculated feature vectors in {kern_end - kern_start:.4f}s")
 
