@@ -6,6 +6,7 @@ from functools import partial
 import numpy as np
 from scipy.sparse import csr_matrix
 from sklearn import svm
+from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
 
 from multiprocessing import Pool
@@ -44,6 +45,10 @@ def compute_gram_matrix(kern: callable, graph_dataset):
     print(f"Calculating {len(graph_dataset)} feature vectors...")
     kern_start = time.perf_counter()
     feature_vectors = kern(*graph_dataset)
+    feature_vectors = np.concatenate(feature_vectors, axis=1)
+    scaler = StandardScaler()
+    scaler.fit(feature_vectors)
+    scaler.transform(feature_vectors)
     if not isinstance(feature_vectors[0], np.ndarray):
         feature_vectors = [fv / np.sqrt(fv.transpose().dot(fv).toarray()[0][0]) for fv in feature_vectors]  # Normalize
     else:
