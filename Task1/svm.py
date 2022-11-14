@@ -9,6 +9,9 @@ from sklearn import svm
 from sklearn.model_selection import cross_val_score
 
 from Kernels.wl_kernel import wl_kernel
+from Kernels.graphlet_kernel import run_graphlet_kernel
+
+from Kernels.closed_walk_kernel import run_cl_kernel
 
 from typing import Literal
 
@@ -31,6 +34,11 @@ def extract_labels_from_dataset(dataset):
 
 
 def compute_gram_matrix(kern: callable, graph_dataset):
+    """
+    kern: passes the kernel used to compute the gram matrix as a callable function
+    graph_dataset: passes the graph dataset as a list of graphs
+    return: the gram matrix as a numpy object
+    """
     gram_m = np.zeros((len(graph_dataset), len(graph_dataset)))
     print(f"Calculating {len(graph_dataset)} feature vectors...")
     kern_start = time.perf_counter()
@@ -51,7 +59,8 @@ def compute_gram_matrix(kern: callable, graph_dataset):
 
         if i % 100 == 0:
             outer_end = time.perf_counter()
-            print(f"Outer: {i}/{len(graph_dataset)} ({i/len(graph_dataset)*100:.2f}%) (Total time: {outer_end-outer_start:.2f}s)")
+            print(f"Outer: {i}/{len(graph_dataset)} ({i/len(graph_dataset)*100:.2f}%) "
+                  f"(Total time: {outer_end-outer_start:.2f}s)")
 
     print(f"Gram matrix construction took {time.perf_counter() - outer_start:.2f}s")
     for m in range(1, len(graph_dataset)):
@@ -63,6 +72,11 @@ def compute_gram_matrix(kern: callable, graph_dataset):
 
 
 def fit(kern: Literal["closed_walk", "graphlet", "WL"], dataset: Literal["DD", "Enzymes", "NCI"]):
+    """
+    kern: gives a kernel to fit an svm to the dataset passed
+    dataset: The dataset based on which the gram matrix is computed (i.e. to which the svm is fitted)
+    Gives no return value but prints the accuracy and std for the given kernel on the given dataset
+    """
     dataset_dir = "./datasets"
     data = None
     match dataset:
@@ -73,7 +87,7 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"], dataset: Literal["DD", "
         case "NCI":
             data = load_file(f"{dataset_dir}/NCI1/data.pkl")
         case _:
-            print(f"Error: {kern} is not a valid kernel")
+            print(f"Error: {dataset} is not a valid dataset")
 
     data = data[:int(len(data)/1)]  # TEMP: Reduce dataset size
 
@@ -82,6 +96,11 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"], dataset: Literal["DD", "
     match kern:
         case "WL":
             kern_func = partial(wl_kernel, 4)
+        case "closed_walk":
+            l = 100
+            kern_func = partial(run_cl_kernel, l)
+        case "graphlet":
+            kern_func = partial(run_graphlet_kernel)
         case _:
             print(f"Error: {kern} is not a valid kernel")
     fit_start = time.perf_counter()
@@ -94,4 +113,4 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"], dataset: Literal["DD", "
 
 
 if __name__ == '__main__':
-    fit("WL", "DD")
+    fit("closed_walk", "DD")
