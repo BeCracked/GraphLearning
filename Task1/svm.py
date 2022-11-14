@@ -38,6 +38,7 @@ def compute_gram_matrix(kern: callable, graph_dataset):
     kern_end = time.perf_counter()
     print(f"Calculated feature vectors in {kern_end-kern_start:.4f}s")
 
+    print(f"Constructing gram matrix...")
     outer_start = time.perf_counter()
     for i in range(0, len(feature_vectors)):
         fv_1: csr_matrix = feature_vectors[i]
@@ -50,7 +51,7 @@ def compute_gram_matrix(kern: callable, graph_dataset):
 
         if i % 100 == 0:
             outer_end = time.perf_counter()
-            print(f"Outer: {i}/{len(graph_dataset)} (Total time: {outer_end-outer_start:.2f}s)")
+            print(f"Outer: {i}/{len(graph_dataset)} ({i/len(graph_dataset)*100:.2f}%) (Total time: {outer_end-outer_start:.2f}s)")
 
     print(f"Gram matrix construction took {time.perf_counter() - outer_start:.2f}s")
     for m in range(1, len(graph_dataset)):
@@ -70,7 +71,7 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"], dataset: Literal["DD", "
         case "Enzymes":
             data = load_file(f"{dataset_dir}/ENZYMES/data.pkl")
         case "NCI":
-            data = load_file(f"{dataset_dir}/NIC1/data.pkl")
+            data = load_file(f"{dataset_dir}/NCI1/data.pkl")
         case _:
             print(f"Error: {kern} is not a valid kernel")
 
