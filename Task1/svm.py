@@ -151,6 +151,7 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"], dataset: Literal["DD", "
             kern_func = partial(run_cl_kernel, l)
         case "graphlet":
             kern_func = partial(run_graphlet_kernel)
+            data = [g for g in data if len(g) >= 5]  # Drop too small graphs from data
         case _:
             print(f"Error: {kern} is not a valid kernel")
     print(f"Fitting SVMs on dataset {dataset!r} with kernel {kern!r}")
