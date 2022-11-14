@@ -119,6 +119,7 @@ def compute_gram_matrix_sync(feature_vectors):
 
     print(f"Gram matrix construction took {time.perf_counter() - outer_start:.2f}s")
 
+
 def fit(kern: Literal["closed_walk", "graphlet", "WL"], dataset: Literal["DD", "Enzymes", "NCI"]):
     """
     kern: gives a kernel to fit an svm to the dataset passed
@@ -139,7 +140,6 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"], dataset: Literal["DD", "
 
     data = data[:int(len(data) / 1)]  # TEMP: Reduce dataset size
 
-    clf = svm.SVC(kernel='precomputed', random_state=42)
     kern_func = None
     match kern:
         case "WL":
@@ -151,9 +151,11 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"], dataset: Literal["DD", "
             kern_func = partial(run_graphlet_kernel)
         case _:
             print(f"Error: {kern} is not a valid kernel")
+    print(f"Fitting SVMs on dataset {dataset!r} with kernel {kern!r}")
     fit_start = time.perf_counter()
     gram_matrix = compute_gram_matrix(kern_func, data)
     labels = extract_labels_from_dataset(data)
+    clf = svm.SVC(kernel='precomputed', random_state=42)
     scores = cross_val_score(clf, gram_matrix, labels, cv=10)
     print("%0.2f accuracy with a standard deviation of %0.2f" % (scores.mean(), scores.std()))
     fit_end = time.perf_counter()
