@@ -27,7 +27,7 @@ class InjectiveHash:
 
 def wl_kernel(k: int, *g: nx.Graph, plot_steps=False) -> list[csr_matrix]:
     # Copy all graphs as we will modify them during the steps
-    graphs: List[nx.Graph] = [copy.deepcopy(graph) for graph in g]
+    graphs: List[nx.Graph] = list(copy.deepcopy(g))
     hash_func = InjectiveHash()
 
     # Initialise node colors
@@ -58,7 +58,7 @@ def wl_kernel(k: int, *g: nx.Graph, plot_steps=False) -> list[csr_matrix]:
 
     # Execute steps
     for i in range(0, k):
-        print(f"Starting colouring step {i+1}/{k}")
+        print(f"Performing colouring step {i+1}/{k}...")
         t_start = time.perf_counter()
         step_vectors = _perform_coloring_step(graphs, hash_func, plot_step=plot_steps)
         # Append histogram vectors for current step
@@ -67,10 +67,12 @@ def wl_kernel(k: int, *g: nx.Graph, plot_steps=False) -> list[csr_matrix]:
         t_end = time.perf_counter()
         print(f"Took {t_end-t_start:.4f}s")
 
+    print("Constructing sparse matrices...")
     sparse_fv = []
     n = max([len(v) for v in feature_vectors])  # Longest vector so all vectors have same shape
     for feature_vector in feature_vectors:
         sparse_fv.append(csr_matrix(feature_vector, shape=(1, n)).transpose())
+    print("Done")
 
     return sparse_fv
 
@@ -99,7 +101,7 @@ def _perform_coloring_step(graphs: List[nx.Graph], hash_func: InjectiveHash, *, 
             color_mapping[node] = {"color_id": color_id, "color": _hash_to_color(str(color_id))}
         # Update information on graphs
         nx.set_node_attributes(graph, color_mapping)
-        if gi + 1 % 2 == 0:
+        if gi % 200 == 0:
             print(f"Done Graph {gi}/{len(graphs)} ({gi / len(graphs) * 100:.2f}%)")
 
     # Extract feature vector
