@@ -1,4 +1,5 @@
 import copy
+import time
 from hashlib import sha256
 from typing import Tuple, Dict, List
 
@@ -24,14 +25,9 @@ class InjectiveHash:
         return self.hash_table[s]
 
 
-def wl_kernel(k: int, g: List[nx.Graph], *, plot_steps=False) -> list[csr_matrix]:
-    graphs: List[nx.Graph] = copy.deepcopy(g)  # Copy all graphs as we will modify them during the steps
-    feature_vectors = {}
-    # Init histogram vectors for each graph, accessible with ids
-    for gi in range(len(graphs)):
-        # Since we don't know how long our vector will be, we append to lists because it's faster
-        feature_vectors[gi] = []
-
+def wl_kernel(k: int, *g: nx.Graph, plot_steps=False) -> list[csr_matrix]:
+    # Copy all graphs as we will modify them during the steps
+    graphs: List[nx.Graph] = [copy.deepcopy(graph) for graph in g]
     hash_func = InjectiveHash()
 
     # Initialise node colors
@@ -41,7 +37,7 @@ def wl_kernel(k: int, g: List[nx.Graph], *, plot_steps=False) -> list[csr_matrix
         color_mapping = {}
         for node in graph.nodes:
             label = ""
-            if isinstance(node, str):
+            if isinstance(node, str):  # consider labels if node name is a string
                 label = node
             color_id = hash_func.get_hash(label)
             unique_colors.add(color_id)
@@ -51,38 +47,36 @@ def wl_kernel(k: int, g: List[nx.Graph], *, plot_steps=False) -> list[csr_matrix
         if plot_steps:
             show_colored_graph(graph)
 
-    # Set feature vector for initial colouring
+    # Construct feature vectors for initial colouring
+    feature_vectors = []
     for gi in range(len(graphs)):
         graph = graphs[gi]
         color_counts = {color: 0 for color in unique_colors}
         for node in graph.nodes("color_id"):
             color_counts[node[1]] += 1
-        feature_vectors[gi].extend([color_counts[color] for color in list(sorted(color_counts.keys()))])
+        feature_vectors.append([color_counts[color] for color in list(sorted(color_counts.keys()))])
 
     # Execute steps
     for i in range(0, k):
+        print(f"Starting colouring step {i+1}/{k}")
+        t_start = time.perf_counter()
+        step_vectors = _perform_coloring_step(graphs, hash_func, plot_step=plot_steps)
         # Append histogram vectors for current step
         for gi in range(len(graphs)):
-            step_vector = _perform_coloring_step(graphs, hash_func, plot_step=plot_steps)
-            feature_vectors[gi].extend(step_vector[gi])
+            feature_vectors[gi].extend(step_vectors[gi])
+        t_end = time.perf_counter()
+        print(f"Took {t_end-t_start:.4f}s")
 
-    # Fill vectors to equal length
-    n = max([len(v) for v in feature_vectors.values()])  # Longest vector
-    for gi, feature_vector in feature_vectors.items():
-        feature_vector += [0] * (n - len(feature_vector))
+    sparse_fv = []
+    n = max([len(v) for v in feature_vectors])  # Longest vector so all vectors have same shape
+    for feature_vector in feature_vectors:
+        sparse_fv.append(csr_matrix(feature_vector, shape=(1, n)).transpose())
 
-    # Transform feature vectors to sparse
-    spare_feature_vectors = []
-    for i in range(len(feature_vectors)):
-        list_vector = feature_vectors[i]
-        vector = csr_matrix(list_vector, shape=(1, len(list_vector))).transpose()
-        spare_feature_vectors.append(vector)
-
-    return spare_feature_vectors
+    return sparse_fv
 
 
 def _perform_coloring_step(graphs: List[nx.Graph], hash_func: InjectiveHash, *, plot_step: bool = False) \
-        -> Dict[int, List[int]]:
+        -> List[List[int]]:
     """
 
     Returns
@@ -91,7 +85,8 @@ def _perform_coloring_step(graphs: List[nx.Graph], hash_func: InjectiveHash, *, 
     """
     unique_colors = set()
     # Do update step
-    for graph in graphs:
+    for gi in range(len(graphs)):
+        graph = graphs[gi]
         color_mapping = {}
         for node, init_color_id in graph.nodes("color_id"):
             # Construct string representation of node colour and neighborhood
@@ -104,16 +99,18 @@ def _perform_coloring_step(graphs: List[nx.Graph], hash_func: InjectiveHash, *, 
             color_mapping[node] = {"color_id": color_id, "color": _hash_to_color(str(color_id))}
         # Update information on graphs
         nx.set_node_attributes(graph, color_mapping)
+        if gi + 1 % 2 == 0:
+            print(f"Done Graph {gi}/{len(graphs)} ({gi / len(graphs) * 100:.2f}%)")
 
     # Extract feature vector
-    feature_vectors = {}
+    feature_vectors = []
     for gi in range(len(graphs)):
         graph = graphs[gi]
         # Count color ids
         color_counts = {color: 0 for color in unique_colors}
         for node in graph.nodes("color_id"):
             color_counts[node[1]] += 1
-        feature_vectors[gi] = [color_counts[color] for color in list(sorted(color_counts.keys()))]
+        feature_vectors.append([color_counts[color] for color in list(sorted(color_counts.keys()))])
 
     if plot_step:
         for graph in graphs:
@@ -201,9 +198,9 @@ if __name__ == '__main__':
 
     G5 = get_random_graph(123146)
 
-    vectors = wl_kernel(4, [G1, G2, G5], plot_steps=False)
+    vectors = wl_kernel(4, G1, G2, G5, plot_steps=False)
 
     for r in range(len(vectors)):
         print(f"G{r + 1} feature vector:")
-        #print(vectors[r])
-        print(vectors[r].get_shape())
+        print(vectors[r])
+        #print(vectors[r].get_shape())

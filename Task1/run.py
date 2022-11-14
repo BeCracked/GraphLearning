@@ -49,7 +49,7 @@ def run_kernel():
         case "WL":
             if not args.quiet:
                 print(f"Executing WL kernel on {len(graphs)} graphs...")
-            feature_vectors = wl_kernel(4, graphs)
+            feature_vectors = wl_kernel(4, *graphs)
             if not args.quiet:
                 print(f"{args.kernel} gave the following feature vectors:")
             print_feature_vectors(feature_vectors)
