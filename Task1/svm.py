@@ -51,13 +51,14 @@ def compute_gram_matrix(kern: callable, graph_dataset):
     pool = Pool()
     # Split work along rows
     graph_start = time.perf_counter()
-    gram_m_par = np.zeros((len(graph_dataset), len(graph_dataset)))
+    gram_m = np.zeros((len(graph_dataset), len(graph_dataset)))
     f = partial(compute_gram_row_chunk, feature_vectors)
     row_chunks = pool.map(f, range(len(feature_vectors)))
+    pool.close()
     graph_end = time.perf_counter()
 
     for i, row_chunk in row_chunks:
-        gram_m_par[i] = row_chunk
+        gram_m[i] = row_chunk
 
     print(f"Took {graph_end-graph_start:.2f}s")
 
