@@ -3,6 +3,7 @@ import copy
 
 import networkx as nx
 import numpy as np
+from scipy.sparse import csr_matrix
 
 from typing import List
 from .graphlets import get_all_graphlets
@@ -30,7 +31,7 @@ def graphlet_kernel(G, seed=12345):
                 feature_vector[0, j] += 1
                 break
 
-    return feature_vector
+    return csr_matrix(feature_vector)
 
 
 def run_graphlet_kernel(*g: nx.Graph):

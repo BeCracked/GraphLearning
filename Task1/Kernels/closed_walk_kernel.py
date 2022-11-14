@@ -1,5 +1,6 @@
 import networkx as nx
 import numpy as np
+from scipy.sparse import csr_matrix
 import copy
 from typing import List
 
@@ -28,7 +29,7 @@ def closed_walk_kernel(G, l):
         # @ is operator for matrix multiplication
         A_exp = A_exp @ A
 
-    return feature_vector
+    return csr_matrix(feature_vector)
 
 
 def run_cl_kernel(l: int, *g: nx.Graph):
