@@ -1,5 +1,7 @@
 import networkx as nx
 import numpy as np
+import copy
+from typing import List
 
 """
 information on how to compute number of closed walks of fixed length:
@@ -27,3 +29,21 @@ def closed_walk_kernel(G, l):
         A_exp = A_exp @ A
 
     return feature_vector
+
+
+def run_cl_kernel(l: int, *g: nx.Graph):
+    graphs: List[nx.Graph] = list(copy.deepcopy(g))
+    feature_vectors = []
+    for i in range(len(graphs)):
+        feature_vectors.append(closed_walk_kernel(graphs[i], l).transpose())
+
+        if i == int(0.25 * len(graphs)):
+            print("25%")
+        elif i == int(0.5 * len(graphs)):
+            print("50%")
+        elif i == int(0.75 * len(graphs)):
+            print("75%")
+        elif i == int(len(graphs) - 1):
+            print("100%")
+
+    return feature_vectors

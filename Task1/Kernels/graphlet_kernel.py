@@ -1,8 +1,10 @@
 import random
+import copy
 
 import networkx as nx
 import numpy as np
 
+from typing import List
 from .graphlets import get_all_graphlets
 
 """
@@ -29,3 +31,21 @@ def graphlet_kernel(G, seed=12345):
                 break
 
     return feature_vector
+
+
+def run_graphlet_kernel(*g: nx.Graph):
+    graphs: List[nx.Graph] = list(copy.deepcopy(g))
+    feature_vectors = []
+    for i in range(len(graphs)):
+        feature_vectors.append(graphlet_kernel(graphs[i]).transpose())
+
+        if i == int(0.25 * len(graphs)):
+            print("25%")
+        elif i == int(0.5 * len(graphs)):
+            print("50%")
+        elif i == int(0.75 * len(graphs)):
+            print("75%")
+        elif i == int(len(graphs) - 1):
+            print("100%")
+
+    return feature_vectors
