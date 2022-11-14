@@ -35,10 +35,9 @@ def wl_kernel(k: int, *g: nx.Graph, plot_steps=False) -> list[csr_matrix]:
     for gi in range(len(graphs)):
         graph = graphs[gi]
         color_mapping = {}
-        for node in graph.nodes:
-            label = ""
-            if isinstance(node, str):  # consider labels if node name is a string
-                label = node
+        for node, data in graph.nodes(data=True):
+            data: dict
+            label = data.get("node_label", "")  # consider labels if present
             color_id = hash_func.get_hash(label)
             unique_colors.add(color_id)
             color_mapping[node] = {"color_id": color_id, "color": _hash_to_color(str(color_id))}
@@ -101,8 +100,10 @@ def _perform_coloring_step(graphs: List[nx.Graph], hash_func: InjectiveHash, *, 
             color_mapping[node] = {"color_id": color_id, "color": _hash_to_color(str(color_id))}
         # Update information on graphs
         nx.set_node_attributes(graph, color_mapping)
-        if gi % 200 == 0:
-            print(f"Done Graph {gi}/{len(graphs)} ({gi / len(graphs) * 100:.2f}%)")
+
+        #if gi % int(0.25*len(graphs)) == 0 and gi != 0:
+        #    print(f"{gi/len(graphs)*100:.0f}%")
+        #print(f"{int(0.25*len(graphs))=} {len(graphs) % int(0.25*len(graphs))=}")
 
     # Extract feature vector
     feature_vectors = []

@@ -6,7 +6,6 @@ from functools import partial
 import numpy as np
 from scipy.sparse import csr_matrix
 from sklearn import svm
-from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
 
 from multiprocessing import Pool
@@ -45,10 +44,6 @@ def compute_gram_matrix(kern: callable, graph_dataset):
     print(f"Calculating {len(graph_dataset)} feature vectors...")
     kern_start = time.perf_counter()
     feature_vectors = kern(*graph_dataset)
-    feature_vectors = np.concatenate(feature_vectors, axis=1)
-    scaler = StandardScaler()
-    scaler.fit(feature_vectors)
-    scaler.transform(feature_vectors)
     if not isinstance(feature_vectors[0], np.ndarray):
         feature_vectors = [fv / np.sqrt(fv.transpose().dot(fv).toarray()[0][0]) for fv in feature_vectors]  # Normalize
     else:
@@ -69,7 +64,7 @@ def compute_gram_matrix(kern: callable, graph_dataset):
     for i, row_chunk in row_chunks:
         gram_m[i] = row_chunk
 
-    print(f"Took {graph_end-graph_start:.2f}s")
+    print(f"Took {graph_end - graph_start:.2f}s")
 
     for m in range(1, len(graph_dataset)):
         for n in range(0, m):
@@ -103,11 +98,10 @@ def compute_gram_row_chunk(feature_vectors: list, i: int,
     gram_row = np.zeros(len(feature_vectors))
     for j in range(j_min, j_max):
         fv_2: csr_matrix = feature_vectors[j]
-        d = fv_1 - fv_2
-        if not isinstance(d, np.ndarray):
-            dist = d.transpose().dot(d).toarray()[0][0]
+        if not isinstance(fv_2, np.ndarray):
+            dist = fv_1.transpose().dot(fv_2).toarray()[0][0]
         else:
-            dist = d.transpose().dot(d)[0][0]
+            dist = fv_1.transpose().dot(fv_2)[0][0]
 
         gram_row[j] = dist
 
@@ -128,13 +122,13 @@ def compute_gram_matrix_sync(feature_vectors):
 
         if i % 100 == 0:
             outer_end = time.perf_counter()
-            print(f"Outer: {i}/{len(feature_vectors)} ({i/len(feature_vectors)*100:.2f}%) "
-                  f"(Total time: {outer_end-outer_start:.2f}s)")
+            print(f"Outer: {i}/{len(feature_vectors)} ({i / len(feature_vectors) * 100:.2f}%) "
+                  f"(Total time: {outer_end - outer_start:.2f}s)")
 
     print(f"Gram matrix construction took {time.perf_counter() - outer_start:.2f}s")
 
 
-def fit(kern: Literal["closed_walk", "graphlet", "WL"], dataset: Literal["DD", "Enzymes", "NCI"]):
+def fit(kern: Literal["closed_walk", "graphlet", "WL"] | str, dataset: Literal["DD", "Enzymes", "NCI"] | str):
     """
     kern: gives a kernel to fit an svm to the dataset passed
     dataset: The dataset based on which the gram matrix is computed (i.e. to which the svm is fitted)
