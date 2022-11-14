@@ -66,6 +66,11 @@ def wl_kernel(k: int, g: List[nx.Graph], *, plot_steps=False) -> list[csr_matrix
             step_vector = _perform_coloring_step(graphs, hash_func, plot_step=plot_steps)
             feature_vectors[gi].extend(step_vector[gi])
 
+    # Fill vectors to equal length
+    n = max([len(v) for v in feature_vectors.values()])  # Longest vector
+    for gi, feature_vector in feature_vectors.items():
+        feature_vector += [0] * (n - len(feature_vector))
+
     # Transform feature vectors to sparse
     spare_feature_vectors = []
     for i in range(len(feature_vectors)):
@@ -200,4 +205,5 @@ if __name__ == '__main__':
 
     for r in range(len(vectors)):
         print(f"G{r + 1} feature vector:")
-        print(vectors[r])
+        #print(vectors[r])
+        print(vectors[r].get_shape())
