@@ -1,6 +1,5 @@
 import networkx as nx
 import numpy as np
-from scipy.sparse import csr_matrix
 import copy
 from typing import List
 
@@ -29,14 +28,14 @@ def closed_walk_kernel(G, l):
         # @ is operator for matrix multiplication
         A_exp = A_exp @ A
 
-    return csr_matrix(feature_vector)
+    return feature_vector
 
 
 def run_cl_kernel(l: int, *g: nx.Graph):
     graphs: List[nx.Graph] = list(copy.deepcopy(g))
     feature_vectors = []
     for i in range(len(graphs)):
-        feature_vectors.append(closed_walk_kernel(graphs[i], l).transpose())
+        feature_vectors.append(closed_walk_kernel(graphs[i], l))
 
         if i == int(0.25 * len(graphs)):
             print("25%")
@@ -47,4 +46,4 @@ def run_cl_kernel(l: int, *g: nx.Graph):
         elif i == int(len(graphs) - 1):
             print("100%")
 
-    return feature_vectors
+    return np.concatenate(feature_vectors, axis=0)

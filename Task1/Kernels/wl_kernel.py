@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from multiset import Multiset
 from scipy.sparse import csr_matrix
+from scipy.sparse import vstack
 
 
 class InjectiveHash:
@@ -70,10 +71,15 @@ def wl_kernel(k: int, *g: nx.Graph, plot_steps=False) -> list[csr_matrix]:
     sparse_fv = []
     n = max([len(v) for v in feature_vectors])  # Longest vector so all vectors have same shape
     for feature_vector in feature_vectors:
-        sparse_fv.append(csr_matrix(feature_vector, shape=(1, n)).transpose())
+        sparse_fv.append(csr_matrix(feature_vector, shape=(1, n)))
+
+    sparse_matrix = sparse_fv[0]
+    for i in range(1, len(sparse_fv)):
+        sparse_matrix = vstack((sparse_matrix, sparse_fv[i]))
+
     print("Done")
 
-    return sparse_fv
+    return sparse_matrix
 
 
 def _perform_coloring_step(graphs: List[nx.Graph], hash_func: InjectiveHash, *, plot_step: bool = False) \

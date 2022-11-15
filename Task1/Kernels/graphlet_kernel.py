@@ -31,14 +31,14 @@ def graphlet_kernel(G, seed=12345):
                 feature_vector[0, j] += 1
                 break
 
-    return csr_matrix(feature_vector)
+    return feature_vector
 
 
 def run_graphlet_kernel(*g: nx.Graph):
     graphs: List[nx.Graph] = list(copy.deepcopy(g))
     feature_vectors = []
     for i in range(len(graphs)):
-        feature_vectors.append(graphlet_kernel(graphs[i]).transpose())
+        feature_vectors.append(graphlet_kernel(graphs[i]))
 
         if i == int(0.25 * len(graphs)):
             print("25%")
@@ -49,4 +49,4 @@ def run_graphlet_kernel(*g: nx.Graph):
         elif i == int(len(graphs) - 1):
             print("100%")
 
-    return feature_vectors
+    return np.concatenate(feature_vectors, axis=0)

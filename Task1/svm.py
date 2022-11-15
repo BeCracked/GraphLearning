@@ -7,12 +7,12 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from sklearn import svm
 from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import StandardScaler
 
 from multiprocessing import Pool
 
 from Kernels.wl_kernel import wl_kernel
 from Kernels.graphlet_kernel import run_graphlet_kernel
-
 from Kernels.closed_walk_kernel import run_cl_kernel
 
 from typing import Tuple, Literal
@@ -41,37 +41,48 @@ def compute_gram_matrix(kern: callable, graph_dataset):
     graph_dataset: passes the graph dataset as a list of graphs
     return: the gram matrix as a numpy object
     """
-    print(f"Calculating {len(graph_dataset)} feature vectors...")
-    kern_start = time.perf_counter()
+
     feature_vectors = kern(*graph_dataset)
-    if not isinstance(feature_vectors[0], np.ndarray):
-        feature_vectors = [fv / np.sqrt(fv.transpose().dot(fv).toarray()[0][0]) for fv in feature_vectors]  # Normalize
+    print(feature_vectors.shape)
+    scaler = StandardScaler(with_mean=False) # with_mean=False needed because of sparse matrix
+    scaler.fit(feature_vectors)
+    feature_vectors_norm = scaler.transform(feature_vectors)
+    gram_matrix = feature_vectors_norm @ feature_vectors_norm.transpose()
+    if not isinstance(gram_matrix[0], np.ndarray):
+        return gram_matrix.toarray()
     else:
-        feature_vectors = [fv / np.sqrt(fv.transpose().dot(fv)[0][0]) for fv in feature_vectors]  # Normalize
-    kern_end = time.perf_counter()
-    print(f"Calculated feature vectors in {kern_end - kern_start:.4f}s")
-
-    print(f"Constructing gram matrix...")
-    pool = Pool()
-    # Split work along rows
-    graph_start = time.perf_counter()
-    gram_m = np.zeros((len(graph_dataset), len(graph_dataset)))
-    f = partial(compute_gram_row_chunk, feature_vectors)
-    row_chunks = pool.map(f, range(len(feature_vectors)))
-    pool.close()
-    graph_end = time.perf_counter()
-
-    for i, row_chunk in row_chunks:
-        gram_m[i] = row_chunk
-
-    print(f"Took {graph_end - graph_start:.2f}s")
-
-    for m in range(1, len(graph_dataset)):
-        for n in range(0, m):
-            gram_m[m][n] = gram_m[n][m]
-
-    save_file(gram_m, "gram_matrix")
-    return gram_m
+        return gram_matrix
+    # print(f"Calculating {len(graph_dataset)} feature vectors...")
+    # kern_start = time.perf_counter()
+    # feature_vectors = kern(*graph_dataset)
+    # if not isinstance(feature_vectors[0], np.ndarray):
+    #     feature_vectors = [fv / np.sqrt(fv.transpose().dot(fv).toarray()[0][0]) for fv in feature_vectors]  # Normalize
+    # else:
+    #     feature_vectors = [fv / np.sqrt(fv.transpose().dot(fv)[0][0]) for fv in feature_vectors]  # Normalize
+    # kern_end = time.perf_counter()
+    # print(f"Calculated feature vectors in {kern_end - kern_start:.4f}s")
+    #
+    # print(f"Constructing gram matrix...")
+    # pool = Pool()
+    # # Split work along rows
+    # graph_start = time.perf_counter()
+    # gram_m = np.zeros((len(graph_dataset), len(graph_dataset)))
+    # f = partial(compute_gram_row_chunk, feature_vectors)
+    # row_chunks = pool.map(f, range(len(feature_vectors)))
+    # pool.close()
+    # graph_end = time.perf_counter()
+    #
+    # for i, row_chunk in row_chunks:
+    #     gram_m[i] = row_chunk
+    #
+    # print(f"Took {graph_end - graph_start:.2f}s")
+    #
+    # for m in range(1, len(graph_dataset)):
+    #     for n in range(0, m):
+    #         gram_m[m][n] = gram_m[n][m]
+    #
+    # save_file(gram_m, "gram_matrix")
+    # return gram_m
 
 
 def compute_gram_row_chunk(feature_vectors: list, i: int,
@@ -146,7 +157,7 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"] | str, dataset: Literal["
         case _:
             print(f"Error: {dataset} is not a valid dataset")
 
-    data = data[:int(len(data) / 1)]  # TEMP: Reduce dataset size
+    # data = data[:int(len(data) / 1)]  # TEMP: Reduce dataset size
 
     kern_func = None
     match kern:
@@ -160,6 +171,7 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"] | str, dataset: Literal["
             data = [g for g in data if len(g) >= 5]  # Drop too small graphs from data
         case _:
             print(f"Error: {kern} is not a valid kernel")
+
     print(f"Fitting SVMs on dataset {dataset!r} with kernel {kern!r}")
     fit_start = time.perf_counter()
     gram_matrix = compute_gram_matrix(kern_func, data)
@@ -172,8 +184,9 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"] | str, dataset: Literal["
 
 
 if __name__ == '__main__':
-    kernels = ["closed_walk", "graphlet", "WL"]
-    datasets = ["DD", "Enzymes", "NCI"]
+    kernels = ["WL", "closed_walk", "graphlet"]
+    datasets = ["Enzymes", "NCI", "DD"]
     for kernel in kernels:
-        fit(kernel, "Enzymes")
+        for dataset in datasets:
+            fit(kernel, dataset)
 
