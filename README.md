@@ -12,6 +12,12 @@ Everything that is relevant for the first exercise can be found in folder ``Task
 
 ## How To Run Scripts
 
+### To train an SVM and print the evaluation results obtained using 10-fold cross validation, execute the following:
+``"svm.py Kernel Dataset`` where Kernel is either closed_walk, graphlet, or WL and Dataset is either DD, Enzymes, or NCI
+
+### To construct and print the feature vectors based on a kernel and a graph dataset, execute the following:
+``run.py Kernel Graphs`` where Kernel is either closed_walk, graphlet, or WL and Graphs is a list of graphs
+
 ## Evaluation Results
 
 |          | Closed Walk kernel | Graphlet kernel | Weisfeiler-Leman kernel |
