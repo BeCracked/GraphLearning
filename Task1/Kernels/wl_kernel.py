@@ -170,6 +170,7 @@ def t_hash():
 
 
 def print_feature_vectors(feature_vectors: List[csr_matrix]):
+    # example from intro slides
     # c_id G0  G1
     # 0     5   5
     # 1     3   2
@@ -201,7 +202,6 @@ if __name__ == '__main__':
 
     G1 = get_random_graph(123147)
     G2 = get_random_graph(123148)
-
     G5 = get_random_graph(123146)
 
     vectors = wl_kernel(4, G1, G2, G5, plot_steps=False)
@@ -209,4 +209,3 @@ if __name__ == '__main__':
     for r in range(len(vectors)):
         print(f"G{r + 1} feature vector:")
         print(vectors[r])
-        #print(vectors[r].get_shape())

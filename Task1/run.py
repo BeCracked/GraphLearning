@@ -6,6 +6,10 @@ from Kernels.graphlet_kernel import graphlet_kernel
 from helper.matrix_io import from_adj_str
 
 
+#############################    THIS IS ONLY FOR TESTING THE KERNELS  CORRECTNESS    #######################
+######################################   NOT USED DURING MAIN EXECUTION   ###################################
+
+
 def run_kernel():
     parser = ap.ArgumentParser(prog="Graph Kernels",
                                description="Allows to get feature vectors for graphs with different kernels")
@@ -26,7 +30,6 @@ def run_kernel():
                 print(f"Executing closed walk kernel on {len(graphs)} graphs...")
             feature_vectors = []
             for graph in graphs:
-                # TODO: need to decide l
                 feature_vectors.append(closed_walk_kernel(graph, 10))
             if not args.quiet:
                 print(f"{args.kernel} gave the following feature vectors:")

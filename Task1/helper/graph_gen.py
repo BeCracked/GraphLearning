@@ -9,6 +9,14 @@ alpha_mapping = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h',
 
 def get_random_graph(seed: int, *, min_node_count: int = 2, max_node_count: int = 10,
                      set_labels: bool = False, allow_self_loops: bool = False) -> nx.Graph:
+    """
+    seed: random seed
+    min_node_count / max_node_count: defines upper and lower bounds of graph size
+    set_labels: flag to optionally define own labeling of nodes
+    allow_self_loops: allow self loops as edges
+    return: networkx graph
+    """
+
     np.random.seed(seed)
     node_count = np.random.randint(min_node_count, max_node_count)
     adj = np.random.randint(0, 2, (node_count, node_count))  # Generate random square binary matrix

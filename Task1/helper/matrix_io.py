@@ -5,6 +5,12 @@ import numpy as np
 
 
 def from_adj_str(adj_s: str, node_labels=None) -> nx.Graph:
+    """
+    adj_s: adjacency matrix of graph in form of string
+    node_labels: optional node labeling flag
+    return: networkx graph
+    """
+
     adj = np.array(json.loads(adj_s))
     if len(adj.shape) == 2 and adj.shape[0] != adj.shape[1]:
         raise ValueError(f"Adjacency matrix has to be 2D and square. Was {adj.shape}")
