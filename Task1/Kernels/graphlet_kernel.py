@@ -7,14 +7,14 @@ import numpy as np
 from typing import List
 from .graphlets import get_all_graphlets
 
-"""
-G: networkx graph
-seed: seed for random sampling
-return: feature vector with shape (1, 34) as numpy array
-"""
-
 
 def graphlet_kernel(G, seed=12345):
+    """
+    G: networkx graph
+    seed: seed for random sampling
+    return: feature vector with shape (1, 34) as numpy array
+    """
+
     random.seed(seed)
     graphlets_list = get_all_graphlets()
 
@@ -34,6 +34,11 @@ def graphlet_kernel(G, seed=12345):
 
 
 def run_graphlet_kernel(*g: nx.Graph):
+    """
+    g: list of graphs from datasets
+    return: numpy matrix with all feature vectors with shape (num_samples, 34)
+    """
+
     graphs: List[nx.Graph] = list(copy.deepcopy(g))
     feature_vectors = []
     for i in range(len(graphs)):

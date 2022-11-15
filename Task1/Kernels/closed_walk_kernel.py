@@ -9,14 +9,14 @@ number of closed walks of length i in G equals trace of adjacency matrix
 that is raised by the power of i (according to literature)
 """
 
-"""
-G: networkx graph
-l: maximum length of closed walks
-return: feature vector with shape (1, l+1) as numpy array
-"""
-
 
 def closed_walk_kernel(G, l):
+    """
+    G: networkx graph
+    l: maximum length of closed walks
+    return: feature vector with shape (1, l+1) as numpy array
+    """
+
     A = nx.to_numpy_matrix(G)
     # A_exp holds adjacency matrix exponentiated with i (start with exponent 0 which is identity matrix)
     A_exp = np.identity(len(G.nodes))
@@ -32,6 +32,12 @@ def closed_walk_kernel(G, l):
 
 
 def run_cl_kernel(l: int, *g: nx.Graph):
+    """
+    l: maximum length of closed walks
+    g: list of graphs from datasets
+    return: numpy matrix with all feature vectors with shape (num_samples, l+1)
+    """
+
     graphs: List[nx.Graph] = list(copy.deepcopy(g))
     feature_vectors = []
     for i in range(len(graphs)):

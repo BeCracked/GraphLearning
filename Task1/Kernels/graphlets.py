@@ -1,12 +1,12 @@
 import networkx as nx
 
-"""
-note that in this case we only consider graphs with 5 nodes (34 graphlets)
-return: list with 34 distinct graphlets
-"""
-
 
 def get_all_graphlets():
+    """
+    note that in this case we only consider graphs with 5 nodes (34 graphlets)
+    return: list with 34 distinct graphlets
+    """
+
     graphlets = []
 
     # 0 edges
