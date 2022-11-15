@@ -77,10 +77,10 @@ The walk-based kernels used in the paper, (p-)random walk, use random walks whic
 
 ### Comment: Number of closed walks of length k (Closed Walk Kernel)
 
-According to literature (https://users.monash.edu/~gfarr/research/slides/Minchenko-RSPlanTalk.pdf), the number of closed walks of length k in G equals the trace of the adjacency matrix of G which is exponentiated by k. We used this formula to calculate for the closed walk kernel.
+According to literature (https://users.monash.edu/~gfarr/research/slides/Minchenko-RSPlanTalk.pdf), the number of closed walks of length k in G equals the trace of the adjacency matrix of G which is exponentiated by k (it considers the eigenvalues of the adjacency matrix of G). We used this formula for the closed walk kernel.
 
 
 ### Comment: Choice of maximal length l (Closed Walk Kernel)
 
-Since the formula we use considers the eigenvalues of a given graph G, which is dependent on the number of nodes in G, we investigated how large the graphs in the datasets are. We observed that some are very small (2 - 100 nodes) and some have over thousand nodes. Since the size of the graphs vary a lot, we decided in the end to set the maximal length to 100.
+Since the formula we used considers the eigenvalues of a given graph G, which is dependent on the number of nodes in G, we investigated how large the graphs in the datasets are. We observed that some are very small (two to more than a hundred nodes) and some have over thousand nodes. Since the size of the graphs vary a lot, we decided in the end to set the maximal length of the closed walks to 100.
 
