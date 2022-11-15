@@ -3,7 +3,6 @@ import copy
 
 import networkx as nx
 import numpy as np
-from scipy.sparse import csr_matrix
 
 from typing import List
 from .graphlets import get_all_graphlets
@@ -39,14 +38,5 @@ def run_graphlet_kernel(*g: nx.Graph):
     feature_vectors = []
     for i in range(len(graphs)):
         feature_vectors.append(graphlet_kernel(graphs[i]))
-
-        if i == int(0.25 * len(graphs)):
-            print("25%")
-        elif i == int(0.5 * len(graphs)):
-            print("50%")
-        elif i == int(0.75 * len(graphs)):
-            print("75%")
-        elif i == int(len(graphs) - 1):
-            print("100%")
 
     return np.concatenate(feature_vectors, axis=0)

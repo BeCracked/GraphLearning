@@ -37,13 +37,4 @@ def run_cl_kernel(l: int, *g: nx.Graph):
     for i in range(len(graphs)):
         feature_vectors.append(closed_walk_kernel(graphs[i], l))
 
-        if i == int(0.25 * len(graphs)):
-            print("25%")
-        elif i == int(0.5 * len(graphs)):
-            print("50%")
-        elif i == int(0.75 * len(graphs)):
-            print("75%")
-        elif i == int(len(graphs) - 1):
-            print("100%")
-
     return np.concatenate(feature_vectors, axis=0)

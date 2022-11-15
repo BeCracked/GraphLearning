@@ -1,7 +1,6 @@
 import copy
-import time
 from hashlib import sha256
-from typing import Tuple, Dict, List
+from typing import Tuple, List
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -26,7 +25,7 @@ class InjectiveHash:
         return self.hash_table[s]
 
 
-def wl_kernel(k: int, *g: nx.Graph, plot_steps=False) -> list[csr_matrix]:
+def wl_kernel(k: int, *g: nx.Graph, plot_steps=False) -> csr_matrix:
     # Copy all graphs as we will modify them during the steps
     graphs: List[nx.Graph] = list(copy.deepcopy(g))
     hash_func = InjectiveHash()
@@ -58,16 +57,16 @@ def wl_kernel(k: int, *g: nx.Graph, plot_steps=False) -> list[csr_matrix]:
 
     # Execute steps
     for i in range(0, k):
-        print(f"Performing colouring step {i+1}/{k}...")
-        t_start = time.perf_counter()
+        #print(f"Performing colouring step {i+1}/{k}...")
+        #t_start = time.perf_counter()
         step_vectors = _perform_coloring_step(graphs, hash_func, plot_step=plot_steps)
         # Append histogram vectors for current step
         for gi in range(len(graphs)):
             feature_vectors[gi].extend(step_vectors[gi])
-        t_end = time.perf_counter()
-        print(f"Took {t_end-t_start:.4f}s")
+        #t_end = time.perf_counter()
+        #print(f"Took {t_end-t_start:.4f}s")
 
-    print("Constructing sparse matrices...")
+    #print("Constructing sparse matrix...")
     sparse_fv = []
     n = max([len(v) for v in feature_vectors])  # Longest vector so all vectors have same shape
     for feature_vector in feature_vectors:
@@ -76,8 +75,6 @@ def wl_kernel(k: int, *g: nx.Graph, plot_steps=False) -> list[csr_matrix]:
     sparse_matrix = sparse_fv[0]
     for i in range(1, len(sparse_fv)):
         sparse_matrix = vstack((sparse_matrix, sparse_fv[i]))
-
-    print("Done")
 
     return sparse_matrix
 
@@ -195,7 +192,7 @@ def print_feature_vectors(feature_vectors: List[csr_matrix]):
 def show_colored_graph(graph: nx.Graph) -> None:
     node_colors = [tuple(ti / 256 for ti in color) for node, color in graph.nodes("color")]
     label_mapping = {node: color_id for node, color_id in graph.nodes("color_id")}
-    nx.draw_networkx(graph, pos=nx.planar_layout(graph), node_size=800, node_color=node_colors, labels=label_mapping)
+    nx.draw_networkx(graph, pos=nx.spring_layout(graph), node_size=800, node_color=node_colors, labels=label_mapping)
     plt.show()
 
 
