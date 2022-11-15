@@ -34,6 +34,7 @@ class SVCGramEstimator(BaseEstimator):
     """
     Wraps a precomputed SVC estimator by computing the gram matrix
     """
+
     def __init__(self):
         self.clf = SVC(kernel="precomputed")
         self.x_trained = None
@@ -65,7 +66,6 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"] | str,
     Gives no return value but prints the accuracy and std for the given kernel on the given dataset
     """
     print("##########################################################################\n")
-    print(f"Fitting SVMs on dataset {dataset!r} with kernel {kern!r}")
     dataset_dir = "./datasets"
     data = None
     match dataset:
@@ -77,8 +77,6 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"] | str,
             data = load_file(f"{dataset_dir}/NCI1/data.pkl")
         case _:
             print(f"Error: {dataset} is not a valid dataset")
-
-    # data = data[:int(len(data) / 1)]  # TEMP: Reduce dataset size
 
     kern_func = None
     match kern:
@@ -92,7 +90,7 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"] | str,
             kern_func = partial(run_graphlet_kernel)
             data = [g for g in data if len(g) >= 5]  # Drop too small graphs from data
         case _:
-            print(f"Error: {args2.kernel} is not a valid kernel")
+            print(f"Error: {kern} is not a valid kernel")
 
     print(f"Fitting SVMs on dataset {dataset!r} with kernel {kern!r}")
     fit_start = time.perf_counter()
@@ -123,7 +121,7 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"] | str,
     return scores.mean(), scores.std()
 
 
-if __name__ == '__main__':
+def run_all():
     kernels = [
         "WL",
         "closed_walk",
@@ -131,8 +129,24 @@ if __name__ == '__main__':
     ]
     results = defaultdict(dict)
     datasets = ["Enzymes", "NCI", "DD"]
-    for dataset in datasets:
+    for ds in datasets:
         for kernel in kernels:
-            results[dataset][kernel] = fit(kernel, dataset)
+            results[ds][kernel] = fit(kernel, ds)
 
     print(results)
+
+
+def run():
+    parser = ap.ArgumentParser(prog="Fit SVM",
+                               description="Trains an SVM based on the passed kernel function and dataset")
+    parser.add_argument("kernel", choices=["closed_walk", "graphlet", "WL"])
+    parser.add_argument("dataset_name", choices=["DD", "Enzymes", "NCI"])
+
+    args = parser.parse_args()
+
+    result = fit(args.kernel, args.dataset_name)
+    print(result)
+
+
+if __name__ == '__main__':
+    run()
