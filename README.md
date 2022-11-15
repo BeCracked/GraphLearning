@@ -18,6 +18,9 @@ Everything else that is relevant for the first exercise can be found in folder `
 ## How To Run Scripts
 
 ### To train an SVM and print the evaluation results obtained using 10-fold cross validation
+
+Go to folder ``Task1`` and execute the following commands:
+
 ``python svm.py closed_walk DD`` 
 
 ``python svm.py closed_walk Enzymes``
