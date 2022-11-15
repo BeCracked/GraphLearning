@@ -8,6 +8,7 @@ from scipy.sparse import csr_matrix
 from sklearn import svm
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
+import argparse as ap
 
 from multiprocessing import Pool
 
@@ -133,15 +134,23 @@ def compute_gram_matrix_sync(feature_vectors):
     print(f"Gram matrix construction took {time.perf_counter() - outer_start:.2f}s")
 
 
-def fit(kern: Literal["closed_walk", "graphlet", "WL"] | str, dataset: Literal["DD", "Enzymes", "NCI"] | str):
+# def fit(kern: Literal["closed_walk", "graphlet", "WL"] | str, dataset: Literal["DD", "Enzymes", "NCI"] | str):
+def fit():
+    parser = ap.ArgumentParser(prog="Fit SVM",
+                               description="Trains an SVM based on the passed kernel function and dataset")
+    parser.add_argument("kernel", choices=["closed_walk", "graphlet", "WL"])
+    parser.add_argument("dataset_name", choices=["DD", "Enzymes", "NCI"])
+    parser.add_argument("-q", "--quiet", action="store_true")
+
+    args2 = parser.parse_args()
     """
     kern: gives a kernel to fit an svm to the dataset passed
     dataset: The dataset based on which the gram matrix is computed (i.e. to which the svm is fitted)
-    Gives no return value but prints the accuracy and std for the given kernel on the given dataset
+    Gives no return value but prints the accuracy and std for the given kernel on the given dataset (using 10-fold cv)
     """
     dataset_dir = "./datasets"
     data = None
-    match dataset:
+    match args2.dataset_name:
         case "DD":
             data = load_file(f"{dataset_dir}/DD/data.pkl")
         case "Enzymes":
@@ -154,7 +163,7 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"] | str, dataset: Literal["
     # data = data[:int(len(data) / 1)]  # TEMP: Reduce dataset size
 
     kern_func = None
-    match kern:
+    match args2.kernel:
         case "WL":
             kern_func = partial(wl_kernel, 4)
         case "closed_walk":
@@ -164,9 +173,9 @@ def fit(kern: Literal["closed_walk", "graphlet", "WL"] | str, dataset: Literal["
             kern_func = partial(run_graphlet_kernel)
             data = [g for g in data if len(g) >= 5]  # Drop too small graphs from data
         case _:
-            print(f"Error: {kern} is not a valid kernel")
+            print(f"Error: {args2.kernel} is not a valid kernel")
 
-    print(f"Fitting SVMs on dataset {dataset!r} with kernel {kern!r}")
+    print(f"Fitting SVMs on dataset {args2.dataset_name!r} with kernel {args2.kernel!r}")
     fit_start = time.perf_counter()
     gram_matrix = compute_gram_matrix(kern_func, data)
     labels = extract_labels_from_dataset(data)
@@ -182,5 +191,5 @@ if __name__ == '__main__':
     datasets = ["Enzymes", "NCI", "DD"]
     for kernel in kernels:
         for dataset in datasets:
-            fit(kernel, dataset)
+            fit()
 
