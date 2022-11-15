@@ -52,7 +52,7 @@ def run_kernel():
             feature_vectors = wl_kernel(4, *graphs)
             if not args.quiet:
                 print(f"{args.kernel} gave the following feature vectors:")
-            print_feature_vectors(feature_vectors)
+            print(feature_vectors.toarray())
 
         case _:
             print(f"Kernel must be in {['closed_walk', 'graphlet', 'wl']}")
