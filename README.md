@@ -40,6 +40,8 @@ Go to folder ``Task1`` and execute the following commands:
 ``python svm.py WL NCI``
 
 ### To test the kernels and print the feature vectors based on a kernel and given graphs
+Go to folder ``Task1`` and execute the following commands:
+
 ``python run.py closed_walk <graphs>``
 
 ``python run.py graphlet <graphs>``
@@ -51,7 +53,7 @@ Go to folder ``Task1`` and execute the following commands:
 An example command to execute Weisfeiler-Lehman-Kernel on two graphs defined by two adjacency matrices.
 
 ```bash
-python Task1/run.py WL "[[0,1,1,0,0],[0,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1],[0,0,0,0,0]]" "[[0,1,1,0,0],[0,1,1,1,0],[0,0,0,1,0],[0,0,0,0,1],[0,0,0,0,0]]"
+python run.py WL "[[0,1,1,0,0],[0,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1],[0,0,0,0,0]]" "[[0,1,1,0,0],[0,1,1,1,0],[0,0,0,1,0],[0,0,0,0,1],[0,0,0,0,0]]"
 ```
 
 ## Evaluation Results
