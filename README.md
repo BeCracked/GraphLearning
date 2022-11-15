@@ -12,33 +12,41 @@ Everything that is relevant for the first exercise can be found in folder ``Task
 
 ## How To Run Scripts
 
-### To train an SVM and print the evaluation results obtained using 10-fold cross validation, execute the following:
-``"svm.py Kernel Dataset`` where Kernel is either closed_walk, graphlet, or WL and Dataset is either DD, Enzymes, or NCI
+### To train an SVM and print the evaluation results obtained using 10-fold cross validation
+``python svm.py Kernel Dataset`` where Kernel is either `closed_walk`, `graphlet`, or `WL` and Dataset is either `DD`, `Enzymes`, or `NCI`
 
-### To construct and print the feature vectors based on a kernel and a graph dataset, execute the following:
-``run.py Kernel Graphs`` where Kernel is either closed_walk, graphlet, or WL and Graphs is a list of graphs
+### To construct and print the feature vectors based on a kernel and a graph dataset
+``python run.py Kernel Graphs`` where Kernel is either `closed_walk`, `graphlet`, or `WL` and Graphs is a list of adjacency matrices as strings.
+
+An example command to execute Weisfeiler-Lehman-Kernel on two graphs defined by two adjacency matrices.
+```bash
+python Task1/run.py WL "[[0,1,1,0,0],[0,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1],[0,0,0,0,0]]" "[[0,1,1,0,0],[0,1,1,1,0],[0,0,0,1,0],[0,0,0,0,1],[0,0,0,0,0]]"
+```
 
 ## Evaluation Results
 
-|          | Closed Walk kernel | Graphlet kernel | Weisfeiler-Leman kernel |
-|---       |--------------------|-----------------|-------------------------|
-|  DD      | 0.76 (+/- 0.02)    | 0.75 (+/- 0.03) | 0.41 (+/- 0.00)         |
-|  ENZYMES | 0.19 (+/- 0.05)    | 0.25 (+/- 0.06) | 0.18 (+/- 0.01)         |
-|  NCI1    | 0.64 (+/- 0.02)    | 0.63 (+/- 0.05) | 0.79 (+/- 0.03)         |
+|         | Graphlet kernel | Closed Walk kernel | Weisfeiler-Lehman kernel |
+|---------|-----------------|--------------------|--------------------------|
+| DD      | 74.35 (±3.58)   | 74.79 (±2.82)      | 78.61 (±2.45)            |
+| ENZYMES | 25.28 (±3.82)   | 22.5 (±6.69)       | 53.67 (±6.72)            |
+| NCI1    | 62.42 (±2.32)   | 65.35 (±1.90)      | 84.67 (±1.12)            |
 
-## Comparison with Paper Results 
+## Comparison with Paper Results
+The walk-based kernels used in the paper, (p-)random walk, use random walks which is why it's not sensible to compare to the closed walk kernels we implemented.
+The accuracies are better everywhere except for Closed Walk/p-Random Walk and WL kernel on DD and NCI1.
+
+The standard deviations of the results of the paper are a lot smaller than ours. This might be because we consider the error on the score itself while the paper gives the error of the estimated mean.
+
+### Excerpt of the Accuracy Results in the Paper
+|         | Graphlet count | p-random walk | WL subtree    |
+|---------|----------------|---------------|---------------|
+| DD      | 78.59 (±0.12)  | 66.64 (±0.83) | 79.78 (±0.36) |
+| ENZYMES | 32.70 (±1.20)  | 27.67 (±0.95) | 46.42 (±1.35) |
+| NCI1    | 66.00 (±0.07)  | 58.66 (±0.28) | 82.19 (±0.18) |
 
 ### Comment: Choice of maximal length l (Closed Walk Kernel)
 
 ### Comment: Number of closed walks of length k (Closed Walk Kernel)
 
 According to references (https://users.monash.edu/~gfarr/research/slides/Minchenko-RSPlanTalk.pdf), the number of closed walks of length k in G equals the trace of the adjacency matrix of G which is exponentiated by k.
-
-<!---
-Example command to execute Weisfeiler-Leman-Kernel on two graphs defined by two adjacency matrices.
-
-```bash
-python Task1/run.py WL "[[0,1,1,0,0],[0,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1],[0,0,0,0,0]]" "[[0,1,1,0,0],[0,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1],[0,0,0,0,0]]"
-```
--->
 
