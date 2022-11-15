@@ -8,17 +8,17 @@ Everything that is relevant for the first exercise can be found in folder ``Task
 * ``datasets`` folder: contains the given three datasets (DD, ENZYMES and NCI1).
 * ``helper`` folder: contains some methods to process the input datasets and generate graphs to test the kernels.
 * ``run.py`` file: to execute all kernels and obtain the feature vectors
-* ``svm.py`` file: to calculate the gram matrix and train/evaluate the SVM model
+* ``svm.py`` file: to calculate the gram matrix and train/evaluate the SVM model on all 3 datasets, using all 3 kernels
 
 ## How To Run Scripts
 
 ## Evaluation Results
 
-|          | Closed Walk kernel |  Graphlet kernel|  Weisfeiler-Leman kernel| 
-|---       |---                 |---              |---                      |
-|  DD      |                    |                 |                         |   
-|  ENZYMES |                    |                 |                         |   
-|  NCI1    |                    |                 |                         | 
+|          | Closed Walk kernel | Graphlet kernel | Weisfeiler-Leman kernel |
+|---       |--------------------|-----------------|-------------------------|
+|  DD      | 0.76 (+/- 0.02)    | 0.75 (+/- 0.03) | 0.41 (+/- 0.00)         |
+|  ENZYMES | 0.19 (+/- 0.05)    | 0.25 (+/- 0.06) | 0.18 (+/- 0.01)         |
+|  NCI1    | 0.64 (+/- 0.02)    | 0.63 (+/- 0.05) | 0.79 (+/- 0.03)         |
 
 ## Comparison with Paper Results 
 

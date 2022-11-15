@@ -20,11 +20,6 @@ from typing import Tuple, Literal
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
-def save_file(a_dict, filename):
-    with open(filename + '.pkl', 'wb') as f:
-        pickle.dump(a_dict, f)
-
-
 def load_file(dict_name: str):
     with open(dict_name, 'rb') as f:
         loaded_file = pickle.load(f)
@@ -81,7 +76,6 @@ def compute_gram_matrix(kern: callable, graph_dataset):
     #     for n in range(0, m):
     #         gram_m[m][n] = gram_m[n][m]
     #
-    # save_file(gram_m, "gram_matrix")
     # return gram_m
 
 
