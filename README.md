@@ -1,5 +1,4 @@
-# Graph Learning
-Please use this readme to describe how to run your code and the results you obtained in each exercise.
+# Task 1
 
 ## Repository Structure
 
@@ -9,7 +8,7 @@ The ```requirements.txt``` can be installed with the following command:
 
 Everything else that is relevant for the first exercise can be found in folder ```Task1```:
 
-* ```Kernels``` folder: contains all three kernels (Closed Walk, Graphlets and Weisfeiler-Leman) and ```graphlets.py``` which is a collection of all 34 graphlets.
+* ```Kernels``` folder: contains all three kernels (Closed Walk, Graphlets and Weisfeiler-Lehman) and ```graphlets.py``` which is a collection of all 34 graphlets.
 * ```datasets``` folder: contains the given three datasets (DD, ENZYMES and NCI1).
 * ```helper``` folder: contains some methods to process the input datasets and generate graphs to test the kernels.
 * ```run.py``` file: is just for testing the correctness of the kernels and is not used during the SVM training.
@@ -84,3 +83,27 @@ According to literature (https://users.monash.edu/~gfarr/research/slides/Minchen
 
 Since the formula we used considers the eigenvalues of a given graph G, which is dependent on the number of nodes in G, we investigated how large the graphs in the datasets are. We observed that some are very small (two to more than a hundred nodes) and some have over thousand nodes. Since the size of the graphs vary a lot, we decided in the end to set the maximal length of the closed walks to 100.
 
+## Presentation Questions
+
+### Implemented Features
+- Run-able Kernels with any adjacency matrix
+  - Closed Walk (Jessica)
+  - Graphlets (Jessica)
+  - Weisfeiler-Lehman (Felix)
+- Basic visualisation of graph colouring steps (Felix)
+- SVM training on pre-defined datasets with implemented Kernels (Timo)
+
+### Results
+- For accuracy data see section (Evaluation Results)[#evaluation-results]
+- Runtimes vary but WL also fast there
+
+### Interpretation
+- Weisfeiler-Lehman best across all datasets with good runtime
+- Closed Walk Kernel's parameter l difficult to tune
+  - Misses long walks which can be relevant
+- Graphlet Kernel's parameter k has to be chosen carefully
+  - Greaphlets have to be pre-computed
+- WL seems to be best able to adapt to different kind of graphs
+- Comparison to paper:
+  - Our implementation slightly more accurate on Enzymes and DD
+  - Greater standard deviation
