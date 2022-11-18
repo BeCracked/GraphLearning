@@ -101,8 +101,8 @@ Since the formula we used considers the eigenvalues of a given graph G, which is
 - Weisfeiler-Lehman best across all datasets with good runtime
 - Closed Walk Kernel's parameter l difficult to tune
   - Misses long walks which can be relevant
-- Graphlet Kernel's parameter k has to be chosen carefully
-  - Greaphlets have to be pre-computed
+- A lot of isormorphic tests necessary to find graphlets
+  - Decided to pre-compute all graphlets
 - WL seems to be best able to adapt to different kind of graphs
 - Comparison to paper:
   - Our implementation slightly more accurate on Enzymes and DD
