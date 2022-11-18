@@ -3,52 +3,52 @@ Please use this readme to describe how to run your code and the results you obta
 
 ## Repository Structure
 
-The ``requirements.txt`` can be installed with the following command:
+The ```requirements.txt``` can be installed with the following command:
 
-``pip install -r requirements.txt``
+```pip install -r requirements.txt```
 
-Everything else that is relevant for the first exercise can be found in folder ``Task1``:
+Everything else that is relevant for the first exercise can be found in folder ```Task1```:
 
-* ``Kernels`` folder: contains all three kernels (Closed Walk, Graphlets and Weisfeiler-Leman) and ``graphlets.py`` which is a collection of all 34 graphlets.
-* ``datasets`` folder: contains the given three datasets (DD, ENZYMES and NCI1).
-* ``helper`` folder: contains some methods to process the input datasets and generate graphs to test the kernels.
-* ``run.py`` file: is just for testing the correctness of the kernels and is not used during the SVM training.
-* ``svm.py`` file: to calculate the gram matrix and train/evaluate the SVM model on all 3 datasets using all 3 kernels (main execution file).
+* ```Kernels``` folder: contains all three kernels (Closed Walk, Graphlets and Weisfeiler-Leman) and ```graphlets.py``` which is a collection of all 34 graphlets.
+* ```datasets``` folder: contains the given three datasets (DD, ENZYMES and NCI1).
+* ```helper``` folder: contains some methods to process the input datasets and generate graphs to test the kernels.
+* ```run.py``` file: is just for testing the correctness of the kernels and is not used during the SVM training.
+* ```svm.py``` file: to calculate the gram matrix and train/evaluate the SVM model on all 3 datasets using all 3 kernels (main execution file).
 
 ## How To Run Scripts
 
 ### To train an SVM and print the evaluation results obtained using 10-fold cross validation
 
-Go to folder ``Task1`` and execute the following commands:
+Go to folder ```Task1``` and execute the following commands:
 
-``python svm.py closed_walk DD`` 
+```python svm.py closed_walk DD``` 
 
-``python svm.py closed_walk Enzymes``
+```python svm.py closed_walk Enzymes```
 
-``python svm.py closed_walk NCI``
+```python svm.py closed_walk NCI```
 
-``python svm.py graphlet DD``
+```python svm.py graphlet DD```
 
-``python svm.py graphlet Enzymes``
+```python svm.py graphlet Enzymes```
 
-``python svm.py graphlet NCI``
+```python svm.py graphlet NCI```
 
-``python svm.py WL DD``
+```python svm.py WL DD```
 
-``python svm.py WL Enzymes``
+```python svm.py WL Enzymes```
 
-``python svm.py WL NCI``
+```python svm.py WL NCI```
 
 ### To test the kernels and print the feature vectors based on a kernel and given graphs
-Go to folder ``Task1`` and execute the following commands:
+Go to folder ```Task1``` and execute the following commands:
 
-``python run.py closed_walk <graphs>``
+```python run.py closed_walk <graphs>```
 
-``python run.py graphlet <graphs>``
+```python run.py graphlet <graphs>```
 
-``python run.py WL <graphs>``
+```python run.py WL <graphs>```
 
- where ``<graphs>`` is a list of adjacency matrices as strings.
+ where ```<graphs>``` is a list of adjacency matrices as strings.
 
 An example command to execute Weisfeiler-Lehman-Kernel on two graphs defined by two adjacency matrices.
 
