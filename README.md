@@ -104,6 +104,7 @@ Since the formula we used considers the eigenvalues of a given graph G, which is
 - A lot of isormorphic tests necessary to find graphlets
   - Decided to pre-compute all graphlets
 - WL seems to be best able to adapt to different kind of graphs
+  - The colouring is able to dynamically represent sub-graphs
 - Comparison to paper:
   - Our implementation slightly more accurate on Enzymes and DD
   - Greater standard deviation
