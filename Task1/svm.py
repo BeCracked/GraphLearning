@@ -1,4 +1,4 @@
-import pickle
+import argparse as ap
 import time
 import warnings
 from collections import defaultdict
@@ -7,27 +7,17 @@ from typing import Literal
 
 import numpy as np
 from sklearn.base import BaseEstimator
-from sklearn.model_selection import cross_val_score, cross_validate
+from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.utils import shuffle
-import argparse as ap
 
 from Kernels.closed_walk_kernel import run_cl_kernel
 from Kernels.graphlet_kernel import run_graphlet_kernel
 from Kernels.wl_kernel import wl_kernel
+from helper.data_handling import load_file, extract_labels_from_dataset
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-
-def load_file(dict_name: str):
-    with open(dict_name, 'rb') as f:
-        loaded_file = pickle.load(f)
-        return loaded_file
-
-
-def extract_labels_from_dataset(dataset):
-    return [element.graph['label'] for element in dataset]
 
 
 class SVCGramEstimator(BaseEstimator):
