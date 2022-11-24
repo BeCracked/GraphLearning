@@ -6,7 +6,7 @@ from GCNLayer import GCNLayer
 class GNetwork(torch.nn.Module):
     def __init__(self, input_dim: int, output_dim: int, hidden_dim: int, num_layers: int):
         """
-        A multilayer perceptron for classification
+        Creates a network of GCN layers.
 
         Parameters
         ----------
@@ -32,7 +32,6 @@ class GNetwork(torch.nn.Module):
 
         # Setup output layer
         self.output_layer = GCNLayer(hidden_dim, output_dim)
-
 
     def forward(self, x):
         """
