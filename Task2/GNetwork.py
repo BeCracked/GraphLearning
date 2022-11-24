@@ -33,13 +33,14 @@ class GNetwork(torch.nn.Module):
         # Setup output layer
         self.output_layer = GCNLayer(hidden_dim, output_dim)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor, adj_matrices: torch.Tensor):
         """
         Forward computation of the GCN Network.
 
         Parameters
         ----------
         x Input vector of GCN Network
+        adj_matrices Adjacency matrices of each graph
 
         Returns
         -------
@@ -47,7 +48,7 @@ class GNetwork(torch.nn.Module):
         """
 
         # apply layers
-        y = self.input_layer(x)
+        y = self.input_layer(x, adj_matrices)
         for i in range(self.num_layers - 2):
             y = self.hidden_layers[i](y)
         y = self.output_layer(y)
