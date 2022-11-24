@@ -30,6 +30,10 @@ class GCNGraph(torch.nn.Module):
             [GCNLayer.GCNLayer(hidden_dim, hidden_dim) for _ in range(num_layers - 2)]
         )
 
+        # setup pooling layer (we use average pooling and then multiply by pooling surface for sum pooling)
+        # TODO: not sure about kernel size (and other parameters)
+        self.pooling_layer = torch.nn.AvgPool2d(kernel_size=(1, output_dim))
+
     def forward(self, x):
         """
         Forward computation of the GCN graph.
@@ -43,8 +47,11 @@ class GCNGraph(torch.nn.Module):
         Output vector of GCN graph
         """
 
+        # apply layers
         y = self.input_layer(x)
         for i in range(self.num_layers - 2):
             y = self.hidden_layers[i](y)
         y = self.output_layer(y)
+        # apply pooling (and transform to sum pooling)
+        y = self.pooling_layer(y) * 64
         return y
