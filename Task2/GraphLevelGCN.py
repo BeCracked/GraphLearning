@@ -19,7 +19,7 @@ class GraphLevelGCN(torch.nn.Module):
 
         Returns
         -------
-
+        Full graph-level GCN.
         """
         super(GraphLevelGCN, self).__init__()
 
