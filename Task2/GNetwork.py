@@ -44,7 +44,7 @@ class GNetwork(torch.nn.Module):
 
         Returns
         -------
-        Output vector of GCN Network.
+        Full GCN Network.
         """
 
         # apply layers
