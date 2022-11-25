@@ -1,6 +1,7 @@
 import torch
 import pickle
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, TensorDataset, SubsetRandomSampler
+from sklearn.model_selection import KFold
 
 import preprocessing
 from GraphLevelGCN import GraphLevelGCN
@@ -31,6 +32,7 @@ def load_data(path: str, dataset: str):
     labels = preprocessing.extract_labels_from_dataset(data)
     num_labels = len(set(labels))
     labels = torch.tensor(labels)
+    # TODO: prep stuff for ENZYMES
     if dataset == 'NCI':
         labels = torch.nn.functional.one_hot(labels, num_classes=num_labels)
 
@@ -42,39 +44,66 @@ def run_graph_classification(device='cpu'):
     x, a, y, num_labels = load_data("../Task1/datasets/ENZYMES/data.pkl")
 
     # Create dataset and loader for mini batches
-    train_dataset = TensorDataset(x, a, y)
-    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+    dataset = TensorDataset(x, a, y)
 
-    # Construct neural network and move it to device
-    # Input dimension: length of node vectors, Output dimension: number of labels
-    model = GraphLevelGCN(input_dim=len(x[0][0]), output_dim=num_labels, hidden_dim=64)
-    model.train()
-    model.to(device)
+    # TODO: determine epochs and learning and (batch size) rate empirically
 
-    # TODO: determine epochs and learning rate empirically
-    # construct optimizer
-    opt = torch.optim.Adam(model.parameters(), lr=0.001)
+    # Setup 10-fold cross validation
+    kf = KFold(n_splits=10, random_state=42, shuffle=True)
+    train_accuracy = []
 
-    # Training loop
-    for epoch in range(100):
-        for x_train, a_train, y_true in train_loader:
-            # Set gradients to zero
-            opt.zero_grad()
+    for train_indices, test_indices in kf.split(dataset, y):
+        # Extract training and test data for each fold
+        train_data_sub = SubsetRandomSampler(train_indices)
+        test_data_sub = SubsetRandomSampler(test_indices)
 
-            # Move data to device
-            x_train = x_train.to(device)
-            a_train = a_train.to(device)
-            y_true = y_true.to(device)
+        train_loader = DataLoader(dataset, batch_size=32, sampler=train_data_sub)
+        test_loader = DataLoader(dataset, batch_size=32, sampler=test_data_sub)
 
-            # Forward pass and loss
-            y_pred = model(x_train, a_train)
-            loss = torch.nn.functional.cross_entropy(y_pred, y_true)
+        # Construct neural network and move it to device
+        # Input dimension: length of node vectors, Output dimension: number of labels
+        model = GraphLevelGCN(input_dim=len(x[0][0]), output_dim=num_labels, hidden_dim=64)
+        model.train()
+        model.to(device)
 
-            # Backward pass and sgd step
-            loss.backward()
-            opt.step()
+        # Construct optimizer
+        opt = torch.optim.Adam(model.parameters(), lr=0.001)
+
+        # Training loop
+        for epoch in range(100):
+            for x_train, a_train, y_train in train_loader:
+                # Set gradients to zero
+                opt.zero_grad()
+
+                # Move data to device
+                x_train = x_train.to(device)
+                a_train = a_train.to(device)
+                y_train = y_train.to(device)
+
+                # Forward pass and loss
+                y_pred = model(x_train, a_train)
+                loss = torch.nn.functional.cross_entropy(y_pred, y_train)
+
+                # Backward pass and sgd step
+                loss.backward()
+                opt.step()
+
+        # Evaluate fold on test loader
+        num_pred_correct = 0
+        num_pred_total = 0
+        for x_test, a_test, y_test in train_loader:
+            y_pred = model(x_test, a_test)
+            num_pred_total += y_test.size(0)
+            num_pred_correct += torch.sum(y_pred == y_test).item()
+        train_accuracy.append(num_pred_correct / num_pred_total)
+        print("one fold done")
+
+    test_accuracy = sum(train_accuracy) / len(train_accuracy)
+
+    return train_accuracy, test_accuracy
 
 
 if __name__ == '__main__':
-    run_graph_classification()
-
+    train_ac, test_ac = run_graph_classification()
+    print(train_ac)
+    print(test_ac)
