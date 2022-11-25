@@ -41,7 +41,7 @@ def load_data(path: str, dataset: str):
 
 def run_graph_classification(device='cpu'):
     # Extract node features, adjacency matrices, labels and convert to tensors
-    x, a, y, num_labels = load_data("../Task1/datasets/ENZYMES/data.pkl")
+    x, a, y, num_labels = load_data("../Task1/datasets/NCI1/data.pkl", "NCI")
 
     # Create dataset and loader for mini batches
     dataset = TensorDataset(x, a, y)
