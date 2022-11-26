@@ -50,6 +50,6 @@ class GNetwork(torch.nn.Module):
         # apply layers
         y = self.input_layer(x, adj_matrices)
         for i in range(self.num_layers - 2):
-            y = self.hidden_layers[i](y)
-        y = self.output_layer(y)
+            y = self.hidden_layers[i](y, adj_matrices)
+        y = self.output_layer(y, adj_matrices)
         return y

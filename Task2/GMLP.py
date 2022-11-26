@@ -1,6 +1,7 @@
 import torch
 
 from GCNLayer import GCNLayer
+from NormalLayer import NormalLayer
 
 
 class GMLP(torch.nn.Module):
@@ -23,12 +24,12 @@ class GMLP(torch.nn.Module):
         self.num_layers = num_layers
 
         # Setup input layer and (linear) output layer
-        self.input_layer = GCNLayer(input_dim, hidden_dim)
+        self.input_layer = NormalLayer(input_dim, hidden_dim)
         self.output_layer = torch.nn.Linear(hidden_dim, output_dim)
 
         # Setup hidden layers in ModuleList
         self.hidden_layers = torch.nn.ModuleList(
-            [GCNLayer(hidden_dim, hidden_dim) for _ in range(num_layers - 2)]
+            [NormalLayer(hidden_dim, hidden_dim) for _ in range(num_layers - 2)]
         )
 
     def forward(self, x: torch.Tensor):
@@ -44,6 +45,6 @@ class GMLP(torch.nn.Module):
         """
         y = self.input_layer(x)
         for i in range(self.num_layers - 2):
-            y = self.hidden_layers(y)
+            y = self.hidden_layers[i](y)
         y = self.output_layer(y)
         return y

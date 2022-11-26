@@ -33,6 +33,8 @@ class GraphLevelGCN(torch.nn.Module):
         y = self.GCNNetwork(x, adj_matrices)
         # Apply sum pooling # TODO: not sure if pooling is correct
         y = torch.sum(y, 1, keepdim=True)
+        # Remove dimensions of 1 (otherwise shape conflict)
+        y = torch.squeeze(y)
         # Apply MLP classification
         y = self.MLPClassification(y)
         return y

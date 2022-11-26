@@ -34,7 +34,10 @@ def load_data(path: str, dataset: str):
 
     # Extract labels and cast to tensor
     labels = preprocessing.extract_labels_from_dataset(data)
-    num_labels = len(set(labels))
+    possible_labels = list(set(labels))
+    num_labels = len(possible_labels)
+    # cross entropy takes indices of labels, not labels itself
+    labels = [possible_labels.index(label) for label in labels]
     labels = torch.tensor(labels)
 
     return node_features, norm_matrices, labels, num_labels
@@ -71,7 +74,7 @@ def run_graph_classification(path: str, dataset_name: str, device: str = "cpu"):
         opt = torch.optim.Adam(model.parameters(), lr=0.001)
 
         # Training loop
-        for epoch in range(100):
+        for epoch in range(10):
             for x_train, a_train, y_train in train_loader:
                 # Set gradients to zero
                 opt.zero_grad()
@@ -80,7 +83,6 @@ def run_graph_classification(path: str, dataset_name: str, device: str = "cpu"):
                 x_train = x_train.to(device)
                 a_train = a_train.to(device)
                 y_train = y_train.to(device)
-
                 # Forward pass and loss
                 y_pred = model(x_train, a_train)
                 loss = torch.nn.functional.cross_entropy(y_pred, y_train)
@@ -92,10 +94,12 @@ def run_graph_classification(path: str, dataset_name: str, device: str = "cpu"):
         # Evaluate fold on test loader
         num_pred_correct = 0
         num_pred_total = 0
-        for x_test, a_test, y_test in train_loader:
+        for x_test, a_test, y_test in test_loader:
             y_pred = model(x_test, a_test)
             num_pred_total += y_test.size(0)
-            num_pred_correct += torch.sum(y_pred == y_test).item()
+            # we need the predicted class which are the indices where we have entry 1
+            _, pred_class = torch.max(y_pred, 1)
+            num_pred_correct += torch.sum(pred_class == y_test).item()
         train_accuracy.append(num_pred_correct / num_pred_total)
         print("one fold done")
 
