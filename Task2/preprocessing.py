@@ -66,62 +66,77 @@ def norm_adj_matrices(graphs: list[nx.Graph] | np.ndarray[nx.Graph], dtype=torch
     return t_m
 
 
-def get_node_feature_embedding(graph: nx.Graph, features_key: str = "node_attributes",
-                               node_pad_length: int = None, feature_pad_length: int = None) -> Tensor:
-    """
-    Constructs the tensor of shape (node_count, feature_length)
-    containing the node feature vectors of the nodes for the given graph.
-    ----------
-    graph The graph to get the node feature embedding for.
-    features_key The key where the feature data is stored in the node data dict. Defaults to "node_attributes".
-    node_pad_length The length to pad the nodes (aka. number of feature vectors) to.
-    feature_pad_length The length to pad the feature vectors to.
-
-    Returns
-    -------
-    The tensor with the concatenated node feature vectors.
-    """
-    node_length = node_pad_length if node_pad_length else graph.number_of_nodes()
-    feature_length = feature_pad_length if feature_pad_length else max(len(attributes) for n, attributes in graph)
-    shape = (node_length, feature_length)
-
-    t_m = torch.zeros(shape)
-    nodes = list(graph.nodes(data=features_key))
-    for i in range(graph.number_of_nodes()):
-        node, attributes = nodes[i]
-        t_m[i] = tensor(attributes)
-
-    return t_m
-
-
 def get_node_feature_embeddings(graphs: list[nx.Graph] | np.ndarray[nx.Graph],
-                                features_key: str = "node_attributes") -> Tensor:
+                                with_attributes: bool = False) -> Tensor:
     """
-    Constructs the 3D tensor of shape (len(graphs), max_number_of_nodes, max_feature_vec_length)
-    containing the concatenated node feature vectors for all given graphs.
+    Constructs the 3D tensor of shape (len(graphs), max_number_of_nodes, len(node_labels))
+    containing the concatenated node feature vectors for all given graphs (in one hot encoding).
 
     Parameters
     ----------
     graphs List of graphs to get the node feature embeddings for.
-    features_key The key where the feature data is stored in the node data dict. Defaults to "node_attributes".
+    with_attributes Flag that considers additional node attributes if True
 
     Returns
     -------
-    A 3D tensor of shape (len(graphs), max_number_of_nodes, max_feature_vec_length)
-    containing the concatenated node feature vectors for all given graphs.
+    A 3D tensor of shape (len(graphs), max_number_of_nodes, len(node_labels))
+    containing the concatenated node feature vectors for all given graphs (in one hot encoding).
     """
     # Length of the longest node feature vector
     max_number_of_nodes = max([g.number_of_nodes() for g in graphs])
-    max_feature_vec_length = len(graphs[0].nodes(data=features_key)[1])  # Assumes all feature vectors are of same length
-    shape = (len(graphs), max_number_of_nodes, max_feature_vec_length)
+    # List of all node labels
+    node_labels = get_all_node_labels(graphs)
 
-    t_m = torch.zeros(shape)
-    for i in range(len(graphs)):
-        t = get_node_feature_embedding(graphs[i], features_key,
-                                       node_pad_length=max_number_of_nodes, feature_pad_length=max_feature_vec_length)
-        t_m[i] = t
+    # Create one hot encoding of graphs
+    embeddings = []
+    for graph in graphs:
+        one_hot_graph = []
+        for node in graph.nodes(data=True):
+            one_hot_vector = [0] * len(node_labels)
+            one_hot_vector[node_labels.index(node[1]["node_label"])] = 1
+            one_hot_graph.append(one_hot_vector)
+        # Determine how much padding to add
+        for _ in range(max_number_of_nodes - len(graph)):
+            one_hot_graph.append([0] * len(node_labels))
+        embeddings.append(one_hot_graph)
 
-    return t_m
+    # Add node attributes to one hot encoding of node label
+    if with_attributes:
+        # assume node attribute vectors are of the same length
+        len_node_attribute = 0
+        for i in range(len(graphs)):
+            for j in range(len(graphs[i])):
+                # extend node vector by node attributes
+                node_attributes = graphs[i].nodes(data=True)[j][1]["node_attributes"]
+                # normalize node_attributes according to l2 norm (default)
+                node_attributes = np.linalg.norm(node_attributes)
+                embeddings[i][j].extend(list(node_attributes))
+                len_node_attribute = len(node_attributes)
+            # extend padding accordingly
+            for j in range(len(graphs[i]), max_number_of_nodes - len(graphs[i])):
+                embeddings[i][j].extend([0] * len_node_attribute)
+
+    # Cast to torch tensor
+    return torch.Tensor(embeddings)
+
+
+def get_all_node_labels(graphs: list[nx.Graph]) -> list:
+    """
+    Extracts all nodes labels from a list of graphs.
+
+    Parameters
+    ----------
+    graphs List of networkx graphs
+
+    Returns
+    -------
+    List of unique node labels occurring in the graphs.
+    """
+    label_set = set()
+    for graph in graphs:
+        for node in graph.nodes(data=True):
+            label_set.add(node[1]["node_label"])
+    return list(label_set)
 
 
 def extract_labels_from_dataset(dataset: Iterable, label_key: str = "label") -> list:
@@ -141,11 +156,16 @@ def extract_labels_from_dataset(dataset: Iterable, label_key: str = "label") -> 
 
 
 if __name__ == '__main__':
-    from Task1.helper.graph_gen import get_random_graph
-
-    for k in range(20):
-        G = get_random_graph(12345 + k)
-        m = norm_adj_matrix(G, 15)
-        print(len(G.nodes))
-        print(m.toarray())
-        print("####################################")
+    # from Task1.helper.graph_gen import get_random_graph
+    #
+    # for k in range(20):
+    #     G = get_random_graph(12345 + k)
+    #     m = norm_adj_matrix(G, 15)
+    #     print(len(G.nodes))
+    #     print(m.toarray())
+    #     print("####################################")
+    import pickle
+    with open("../Task1/datasets/ENZYMES/data.pkl", 'rb') as f:
+        data = pickle.load(f)
+    d = data[0]
+    print(type(d.nodes[1]["node_attributes"]))

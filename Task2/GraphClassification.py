@@ -26,22 +26,23 @@ def load_data(path: str, dataset: str):
     # Normalize adjacency matrices and cast to tensor
     norm_matrices = preprocessing.norm_adj_matrices(data)
     # Obtain node feature embeddings and cast to tensor
-    node_features = preprocessing.get_node_feature_embeddings(data)
+    node_features = torch.zeros(1)
+    if dataset == "NCI":
+        node_features = preprocessing.get_node_feature_embeddings(data, False)
+    if dataset == "ENZYMES":
+        node_features = preprocessing.get_node_feature_embeddings(data, True)
 
-    # Extract labels, apply one and cast to tensor
+    # Extract labels and cast to tensor
     labels = preprocessing.extract_labels_from_dataset(data)
     num_labels = len(set(labels))
     labels = torch.tensor(labels)
-    # TODO: prep stuff for ENZYMES
-    if dataset == 'NCI':
-        labels = torch.nn.functional.one_hot(labels, num_classes=num_labels)
 
     return node_features, norm_matrices, labels, num_labels
 
 
-def run_graph_classification(device='cpu'):
+def run_graph_classification(path: str, dataset_name: str, device: str = "cpu"):
     # Extract node features, adjacency matrices, labels and convert to tensors
-    x, a, y, num_labels = load_data("../Task1/datasets/NCI1/data.pkl", "NCI")
+    x, a, y, num_labels = load_data(path, dataset_name)
 
     # Create dataset and loader for mini batches
     dataset = TensorDataset(x, a, y)
@@ -104,6 +105,6 @@ def run_graph_classification(device='cpu'):
 
 
 if __name__ == '__main__':
-    train_ac, test_ac = run_graph_classification()
+    train_ac, test_ac = run_graph_classification("../Task1/datasets/NCI1/data.pkl", "NCI", "cpu")
     print(train_ac)
     print(test_ac)
