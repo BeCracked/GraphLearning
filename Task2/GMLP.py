@@ -18,7 +18,7 @@ class GMLP(torch.nn.Module):
 
         Returns
         -------
-
+        Full MLP for classification.
         """
         super(GMLP, self).__init__()
         self.num_layers = num_layers
@@ -43,7 +43,8 @@ class GMLP(torch.nn.Module):
 
         Returns
         -------
-        Full MLP for classification.
+        The result of the output layer of this module.
+
         """
         if self.num_layers > 1:
             y = self.input_layer(x)
