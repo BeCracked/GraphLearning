@@ -38,7 +38,7 @@ def load_data(path: str, dataset: str):
         node_features = preprocessing.get_node_feature_embeddings(data, True)
 
     # Extract labels and cast to tensor
-    labels = preprocessing.extract_labels_from_dataset(data)
+    labels = preprocessing.extract_graph_labels_from_dataset(data)
     possible_labels = list(set(labels))
     num_labels = len(possible_labels)
     # cross entropy takes indices of labels, not labels itself
