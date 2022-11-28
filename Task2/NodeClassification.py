@@ -37,6 +37,7 @@ def load_data(path: str):
     num_labels = len(possible_labels)
     # cross entropy takes indices of labels, not labels itself
     labels = [possible_labels.index(label) for label in labels]
+    labels = [labels]
     labels = torch.tensor(labels)
 
     return node_features, norm_matrices, labels, num_labels
