@@ -67,9 +67,6 @@ def run_node_classification(path_train: str, path_test, *,
     # Extract node features, adjacency matrices, labels and convert to tensors
     x_train, a_train, y_train, num_labels_train = load_data(path_train)
     x_test, a_test, y_test, num_labels_test = load_data(path_test)
-    print(x_train.shape)
-    print(a_train.shape)
-    print(y_train.shape)
 
     # Create dataset and loader for mini batches
     dataset_train = TensorDataset(x_train, a_train, y_train)
