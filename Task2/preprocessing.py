@@ -63,6 +63,7 @@ def norm_adj_matrices(graphs: list[nx.Graph] | np.ndarray[nx.Graph], dtype=torch
         t = tensor(a.toarray(), dtype=dtype)
         t_m[i] = t
 
+    t_m = torch.squeeze(t_m)
     return t_m
 
 
@@ -105,19 +106,21 @@ def get_node_feature_embeddings(graphs: list[nx.Graph] | np.ndarray[nx.Graph],
         # assume node attribute vectors are of the same length
         len_node_attribute = 0
         for i in range(len(graphs)):
-            for j in range(len(graphs[i])):
+            for j, (node_label, node_attributes) in enumerate(graph.nodes(data="node_attributes")):
                 # extend node vector by node attributes
-                node_attributes = graphs[i].nodes(data=True)[j][1]["node_attributes"]
                 # normalize node_attributes according to l2 norm (default)
-                node_attributes = np.linalg.norm(node_attributes)
-                embeddings[i][j].extend(list(node_attributes))
+                l2_norm = np.linalg.norm(node_attributes)
+                node_attributes = node_attributes / l2_norm
+                embeddings[i][j].extend(node_attributes)
                 len_node_attribute = len(node_attributes)
             # extend padding accordingly
             for j in range(len(graphs[i]), max_number_of_nodes - len(graphs[i])):
                 embeddings[i][j].extend([0] * len_node_attribute)
 
     # Cast to torch tensor
-    return torch.Tensor(embeddings)
+    embeddings = torch.Tensor(embeddings)
+    embeddings = torch.squeeze(embeddings)
+    return embeddings
 
 
 def get_all_node_labels(graphs: list[nx.Graph]) -> list:
@@ -139,7 +142,7 @@ def get_all_node_labels(graphs: list[nx.Graph]) -> list:
     return list(label_set)
 
 
-def extract_labels_from_dataset(dataset: Iterable, label_key: str = "label") -> list:
+def extract_graph_labels_from_dataset(dataset: Iterable, label_key: str = "label") -> list:
     """
     Gets the labels of a dataset for datasets that are subscript-able.
 
@@ -153,6 +156,22 @@ def extract_labels_from_dataset(dataset: Iterable, label_key: str = "label") -> 
     The list of labels extracted from the dataset.
     """
     return [element.graph[label_key] for element in dataset]
+
+
+def extract_node_labels_from_dataset(dataset: Iterable, label_key: str = "node_label") -> list:
+    """
+    Gets the node labels of a dataset for datasets that are subscript-able.
+
+    Parameters
+    ----------
+    dataset The dataset of which to get the labels.
+    label_key The key to look at to get the label.
+
+    Returns
+    -------
+    The list of labels extracted from the dataset.
+    """
+    return [node[1] for element in dataset for node in element.nodes(data=label_key)]
 
 
 if __name__ == '__main__':
