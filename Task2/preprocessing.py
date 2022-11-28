@@ -63,7 +63,6 @@ def norm_adj_matrices(graphs: list[nx.Graph] | np.ndarray[nx.Graph], dtype=torch
         t = tensor(a.toarray(), dtype=dtype)
         t_m[i] = t
 
-    t_m = torch.squeeze(t_m)
     return t_m
 
 
@@ -119,7 +118,6 @@ def get_node_feature_embeddings(graphs: list[nx.Graph] | np.ndarray[nx.Graph],
 
     # Cast to torch tensor
     embeddings = torch.Tensor(embeddings)
-    embeddings = torch.squeeze(embeddings)
     return embeddings
 
 
