@@ -14,8 +14,6 @@ argparse = "^1.4.0"
 matplotlib = "^3.6.2"
 pytest = "^7.2.0"
 multiset = "^3.0.1"
-ax-platform = "^0.2.9"
-torchx = "^0.3.0"
 
 
 [build-system]
