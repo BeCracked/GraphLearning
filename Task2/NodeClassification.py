@@ -87,7 +87,7 @@ def run_node_classification(path_train: str, path_test, *,
 
         # Construct neural network and move it to device
         # Input dimension: length of node vectors
-        model = NodeLevelGCN(input_dim=len(x_train[0]), output_dim=num_labels_train, hidden_dim=64)
+        model = NodeLevelGCN(input_dim=len(x_train[0][0]), output_dim=num_labels_train, hidden_dim=64)
         model.train()
         model.to(device)
 
