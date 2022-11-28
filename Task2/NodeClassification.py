@@ -132,6 +132,11 @@ def train_loop(dataloader, model, loss_fn, optimizer):
 
         # Forward pass and loss
         y_pred = model(x_train, a_train)
+
+        # To transform it into suitable shape for cross entropy
+        y_pred = torch.squeeze(y_pred)
+        y_train = torch.squeeze(y_train)
+
         loss = loss_fn(y_pred, y_train)
 
         # Backward pass and sgd step
@@ -149,6 +154,11 @@ def test(dataloader, model, loss_fn):
     with torch.no_grad():
         for batch, (x_test, a_test, y_test) in enumerate(dataloader):
             y_pred = model(x_test, a_test)
+
+            # To transform it into suitable shape for cross entropy
+            y_pred = torch.squeeze(y_pred)
+            y_test = torch.squeeze(y_test)
+
             accuracies[batch] = get_accuracy(y_pred, y_test)
 
     return accuracies.mean(), accuracies.std()  # Means-of-Means can be neglected as data will always be same size
