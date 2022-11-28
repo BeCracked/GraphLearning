@@ -171,6 +171,7 @@ if __name__ == '__main__':
     params = {
         "epochs": 10, "batch_size": 32, "learning_rate": 1e-3, "fold_count": 10
     }
-    res = run_graph_classification("../Task1/datasets/NCI1/data.pkl", "NCI", device="cuda", **params)
-
-    print(res)
+    train_accs, train_stds, test_accs, test_stds = run_graph_classification("../Task1/datasets/NCI1/data.pkl", "NCI",
+                                                                            device="cuda", **params)
+    print(f"Train Accuracy: {np.mean(train_accs)*100:0.2f}%(±{np.mean(train_stds)*100:0.2f})")
+    print(f"Test Accuracy: {np.mean(test_accs)*100:0.2f}%(±{np.mean(test_stds)*100:0.2f})")
