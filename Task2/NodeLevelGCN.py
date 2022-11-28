@@ -5,10 +5,10 @@ from GNetwork import GNetwork
 from GMLP import GMLP
 
 
-class GraphLevelGCN(torch.nn.Module):
+class NodeLevelGCN(torch.nn.Module):
     def __init__(self, input_dim: int, output_dim: int, hidden_dim: int):
         """
-        Construct the graph-level GCN for according to Exercise 3.
+        Construct the node-level GCN for according to Exercise 4.
 
         Parameters
         ----------
@@ -18,23 +18,19 @@ class GraphLevelGCN(torch.nn.Module):
 
         Returns
         -------
-        Full graph-level GCN.
+        Full node-level GCN.
         """
-        super(GraphLevelGCN, self).__init__()
+        super(NodeLevelGCN, self).__init__()
 
         # Setup Network of 5 GCN layers and hidden dimension of 64
-        self.GCNNetwork = GNetwork(input_dim, hidden_dim, hidden_dim, 5)
+        self.GCNNetwork = GNetwork(input_dim, hidden_dim, hidden_dim, 3)
 
-        # Setup MLP classification (one hidden layer of dimension 64, one linear output layer)
-        self.MLPClassification = GMLP(hidden_dim, output_dim, hidden_dim, 2)
+        # Setup MLP classification (one linear output layer)
+        self.MLPClassification = GMLP(hidden_dim, output_dim, hidden_dim, 1)
 
     def forward(self, x: torch.Tensor, adj_matrices: torch.Tensor):
         # Apply GCN network
         y = self.GCNNetwork(x, adj_matrices)
-        # Apply sum pooling
-        y = torch.sum(y, 1, keepdim=True)
-        # Remove dimensions of 1 (otherwise shape conflict)
-        y = torch.squeeze(y)
         # Apply MLP classification
         y = self.MLPClassification(y)
         return y
