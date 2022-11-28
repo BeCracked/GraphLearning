@@ -106,7 +106,7 @@ def get_node_feature_embeddings(graphs: list[nx.Graph] | np.ndarray[nx.Graph],
         # assume node attribute vectors are of the same length
         len_node_attribute = 0
         for i in range(len(graphs)):
-            for j, (node_label, node_attributes) in enumerate(graph.nodes(data="node_attributes")):
+            for j, (node_label, node_attributes) in enumerate(graphs[i].nodes(data="node_attributes")):
                 # extend node vector by node attributes
                 # normalize node_attributes according to l2 norm (default)
                 l2_norm = np.linalg.norm(node_attributes)
