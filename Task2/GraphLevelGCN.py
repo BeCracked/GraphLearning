@@ -25,8 +25,8 @@ class GraphLevelGCN(torch.nn.Module):
         # Setup Network of 5 GCN layers and hidden dimension of 64
         self.GCNNetwork = GNetwork(input_dim, hidden_dim, hidden_dim, 5)
 
-        # Setup MLP classification (one hidden layer of dimension 64, three layers in total)
-        self.MLPClassification = GMLP(hidden_dim, output_dim, hidden_dim, 3)
+        # Setup MLP classification (one hidden layer of dimension 64, one linear output layer)
+        self.MLPClassification = GMLP(hidden_dim, output_dim, hidden_dim, 2)
 
     def forward(self, x: torch.Tensor, adj_matrices: torch.Tensor):
         # Apply GCN network

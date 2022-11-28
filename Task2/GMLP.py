@@ -24,13 +24,15 @@ class GMLP(torch.nn.Module):
         self.num_layers = num_layers
 
         # Setup input layer and (linear) output layer
-        self.input_layer = NormalLayer(input_dim, hidden_dim)
+        if self.num_layers > 1:
+            self.input_layer = NormalLayer(input_dim, hidden_dim)
         self.output_layer = torch.nn.Linear(hidden_dim, output_dim)
 
         # Setup hidden layers in ModuleList
-        self.hidden_layers = torch.nn.ModuleList(
-            [NormalLayer(hidden_dim, hidden_dim) for _ in range(num_layers - 2)]
-        )
+        if self.num_layers > 1:
+            self.hidden_layers = torch.nn.ModuleList(
+                [NormalLayer(hidden_dim, hidden_dim) for _ in range(num_layers - 2)]
+            )
 
     def forward(self, x: torch.Tensor):
         """
@@ -43,8 +45,11 @@ class GMLP(torch.nn.Module):
         -------
         Full MLP for classification.
         """
-        y = self.input_layer(x)
-        for i in range(self.num_layers - 2):
-            y = self.hidden_layers[i](y)
-        y = self.output_layer(y)
+        if self.num_layers > 1:
+            y = self.input_layer(x)
+            for i in range(self.num_layers - 2):
+                y = self.hidden_layers[i](y)
+            y = self.output_layer(y)
+        else:
+            y = self.output_layer(x)
         return y
