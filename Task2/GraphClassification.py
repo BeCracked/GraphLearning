@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import torch
 import pickle
@@ -10,6 +12,8 @@ from tqdm import tqdm
 
 import preprocessing
 from Task2.Modules.GraphLevelGCN import GraphLevelGCN
+
+QUIET = os.getenv("QUIET", default=True)
 
 
 def load_data(path: str, dataset: str):
@@ -86,7 +90,8 @@ def run_graph_classification(path: str, dataset_name: str, *,
 
     results = train_accs, train_stds, test_accs, test_stds = ([], [], [], [])
     for fold, (train_indices, test_indices) in enumerate(kf.split(dataset, y)):
-        print(f"Running fold {fold + 1}/{fold_count}")
+        if not QUIET:
+            print(f"Running fold {fold + 1}/{fold_count}")
 
         # Extract training and test data for each fold
         train_data_sub = SubsetRandomSampler(train_indices)
@@ -109,7 +114,7 @@ def run_graph_classification(path: str, dataset_name: str, *,
 
         # Training loop
         train_acc, train_std = 0, 0
-        for epoch in tqdm(range(epochs)):
+        for epoch in tqdm(range(epochs), disable=QUIET):
             train_acc, train_std = train_loop(train_loader, model, loss_fn, opt)  # Consider only accuracy of last epoch
 
         train_accs.append(train_acc)

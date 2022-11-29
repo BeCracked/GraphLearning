@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import torch
 import pickle
@@ -9,6 +11,8 @@ from tqdm import tqdm
 
 import preprocessing
 from Task2.Modules.NodeLevelGCN import NodeLevelGCN
+
+QUIET = os.getenv("QUIET", default=True)
 
 
 def load_data(path: str):
@@ -43,8 +47,8 @@ def load_data(path: str):
     return node_features, norm_matrices, labels, num_labels
 
 
-def run_node_classification(path_train: str, path_test, *,
-                            device: str|None = None,
+def run_node_classification(path_train: str, path_test: str, *,
+                            device: str | None = None,
                             epochs=10, learning_rate=1e-3) \
         -> tuple[list, list, list, list]:
     """
@@ -79,7 +83,8 @@ def run_node_classification(path_train: str, path_test, *,
     results = train_accs, train_stds, test_accs, test_stds = ([], [], [], [])
     # repeat training and testing 10 times
     for i in range(10):
-        print(f"Running fold {i + 1}/{10}")
+        if not QUIET:
+            print(f"Running fold {i + 1}/{10}")
 
         train_loader = DataLoader(dataset_train, batch_size=1,
                                   collate_fn=lambda v: tuple(v_.to(device) for v_ in default_collate(v)))
@@ -98,7 +103,7 @@ def run_node_classification(path_train: str, path_test, *,
 
         # Training loop
         train_acc, train_std = 0, 0
-        for epoch in tqdm(range(epochs)):
+        for epoch in tqdm(range(epochs), disable=QUIET):
             train_acc, train_std = train_loop(train_loader, model, loss_fn, opt)  # Consider only accuracy of last epoch
 
         train_accs.append(train_acc)
