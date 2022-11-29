@@ -1,10 +1,9 @@
 import torch
 
-from GCNLayer import GCNLayer
-from NormalLayer import NormalLayer
+from Task2.Modules.NormalLayer import NormalLayer
 
 
-class GMLP(torch.nn.Module):
+class MLP(torch.nn.Module):
     def __init__(self, input_dim: int, output_dim: int, hidden_dim: int, num_layers: int):
         """
         A multilayer perceptron for classification.
@@ -20,7 +19,7 @@ class GMLP(torch.nn.Module):
         -------
         Full MLP for classification.
         """
-        super(GMLP, self).__init__()
+        super(MLP, self).__init__()
         self.num_layers = num_layers
 
         # Setup input layer and (linear) output layer

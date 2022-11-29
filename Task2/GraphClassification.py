@@ -9,7 +9,7 @@ from sklearn.model_selection import KFold
 from tqdm import tqdm
 
 import preprocessing
-from GraphLevelGCN import GraphLevelGCN
+from Task2.Modules.GraphLevelGCN import GraphLevelGCN
 
 
 def load_data(path: str, dataset: str):

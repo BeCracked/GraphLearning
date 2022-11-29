@@ -8,7 +8,7 @@ from torch.utils.data.dataloader import default_collate
 from tqdm import tqdm
 
 import preprocessing
-from NodeLevelGCN import NodeLevelGCN
+from Task2.Modules.NodeLevelGCN import NodeLevelGCN
 
 
 def load_data(path: str):
@@ -44,8 +44,8 @@ def load_data(path: str):
 
 
 def run_node_classification(path_train: str, path_test, *,
-                             device: str = "cpu",
-                             epochs=10, learning_rate=1e-3) \
+                            device: str = "cpu",
+                            epochs=10, learning_rate=1e-3) \
         -> tuple[list, list, list, list]:
     """
     Repeats training and testing 10 times with the node classification net on the given training and test dataset.
@@ -172,10 +172,10 @@ if __name__ == '__main__':
     params = {
         "epochs": 10, "learning_rate": 1e-3
     }
-    res = run_node_classification("datasets/Citeseer_Train/data.pkl", "datasets/Citeseer_Eval/data.pkl", device="cpu", **params)
+    res = run_node_classification("datasets/Citeseer_Train/data.pkl", "datasets/Citeseer_Eval/data.pkl", device="cpu",
+                                  **params)
 
     print(res)
-
 
 # if __name__ == '__main__':
 #     with open("datasets/Citeseer_Train/data.pkl", "rb") as f:
