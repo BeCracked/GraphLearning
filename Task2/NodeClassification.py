@@ -23,8 +23,8 @@ def load_data(path: str):
 
     Returns
     -------
-    Normalized matrices as Tensors.
-    Labels as Tensors.
+    Node Feature Embeddings and normalized matrices as Tensors.
+    Labels as Tensors and number of labels.
     """
     # Load dataset
     with open(path, 'rb') as f:
@@ -65,7 +65,7 @@ def run_node_classification(path_train: str, path_test: str, *,
     Returns
     -------
     The accuracy results for training and test run.
-    Tuple of Lists of the form (train_accs, train_stds, test_accs, test_stds)
+    Tuple of Lists of the form (train_accs, train_stds, test_accs, test_stds).
 
     """
     torch.manual_seed(42)
@@ -118,19 +118,18 @@ def run_node_classification(path_train: str, path_test: str, *,
 
 def train_loop(dataloader, model, loss_fn, optimizer):
     """
-    Trains the model for one epoch, i.e. on all batches
+    Trains the model for one epoch, i.e. on all batches.
 
     Parameters
     ----------
-    dataloader The dataloader to use. Needs to provide x: node embeddings, a: normalized adjacency matrices, y: labels
+    dataloader The dataloader to use. Needs to provide x: node embeddings, a: normalized adjacency matrices, y: labels.
     model The model to train.
-    loss_fn The loss function to use. E.g., torch.nn.functional.cross_entropy
-    optimizer The optimizer to use. E.g., torch.optim.Adam(model.parameters(), lr=learning_rate)
+    loss_fn The loss function to use. E.g., torch.nn.functional.cross_entropy.
+    optimizer The optimizer to use. E.g., torch.optim.Adam(model.parameters(), lr=learning_rate).
 
     Returns
     -------
     The list of accuracy values for each batch.
-
     """
     accuracies = np.zeros(len(dataloader))
     for batch, (x_train, a_train, y_train) in enumerate(dataloader):
@@ -184,9 +183,3 @@ if __name__ == '__main__':
                                   **params)
 
     print(res)
-
-# if __name__ == '__main__':
-#     with open("datasets/Citeseer_Train/data.pkl", "rb") as f:
-#         data = pickle.load(f)
-#     node_attributes = data[0].nodes(data=True)[1]
-#     print(node_attributes)

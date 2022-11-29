@@ -10,10 +10,10 @@ class GNetwork(torch.nn.Module):
 
         Parameters
         ----------
-        input_dim Dimension of input layer
-        output_dim Dimension of output layer
-        hidden_dim Dimension of hidden layers
-        num_layers Total number of layers
+        input_dim Dimension of input layer.
+        output_dim Dimension of output layer.
+        hidden_dim Dimension of hidden layers.
+        num_layers Total number of layers.
 
         Returns
         -------
@@ -39,14 +39,13 @@ class GNetwork(torch.nn.Module):
 
         Parameters
         ----------
-        x Input vector of GCN Network
-        adj_matrices Adjacency matrices of each graph
+        x The node feature vectors of each graph.
+        adj_matrices Corresponding normalized adjacency matrices of each graph.
 
         Returns
         -------
         Full GCN Network.
         """
-
         # apply layers
         y = self.input_layer(x, adj_matrices)
         for i in range(self.num_layers - 2):

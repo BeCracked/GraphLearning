@@ -25,8 +25,8 @@ def load_data(path: str, dataset: str):
 
     Returns
     -------
-    Normalized matrices as Tensors.
-    Labels as Tensors.
+    Node Feature Embeddings and normalized matrices as Tensors.
+    Labels as Tensors and number of labels.
     """
     # Load dataset
     with open(path, 'rb') as f:
@@ -72,8 +72,7 @@ def run_graph_classification(path: str, dataset_name: str, *,
     Returns
     -------
     The accuracy results for each fold.
-    Tuple of Lists of the form (train_accs, train_stds, test_accs, test_stds)
-
+    Tuple of Lists of the form (train_accs, train_stds, test_accs, test_stds).
     """
     torch.manual_seed(42)
     if not device:
@@ -129,19 +128,18 @@ def run_graph_classification(path: str, dataset_name: str, *,
 
 def train_loop(dataloader, model, loss_fn, optimizer):
     """
-    Trains the model for one epoch, i.e. on all batches
+    Trains the model for one epoch, i.e. on all batches.
 
     Parameters
     ----------
-    dataloader The dataloader to use. Needs to provide x: node embeddings, a: normalized adjacency matrices, y: labels
+    dataloader The dataloader to use. Needs to provide x: node embeddings, a: normalized adjacency matrices, y: labels.
     model The model to train.
-    loss_fn The loss function to use. E.g., torch.nn.functional.cross_entropy
-    optimizer The optimizer to use. E.g., torch.optim.Adam(model.parameters(), lr=learning_rate)
+    loss_fn The loss function to use. E.g., torch.nn.functional.cross_entropy.
+    optimizer The optimizer to use. E.g., torch.optim.Adam(model.parameters(), lr=learning_rate).
 
     Returns
     -------
     The list of accuracy values for each batch.
-
     """
     accuracies = np.zeros(len(dataloader))
     for batch, (x_train, a_train, y_train) in enumerate(dataloader):

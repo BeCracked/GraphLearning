@@ -10,14 +10,14 @@ class MLP(torch.nn.Module):
 
         Parameters
         ----------
-        input_dim Dimension of input layer
-        output_dim Dimension of output layer
-        hidden_dim Dimension of hidden layers
-        num_layers Total number of layers
+        input_dim Dimension of input layer.
+        output_dim Dimension of output layer.
+        hidden_dim Dimension of hidden layers.
+        num_layers Total number of layers.
 
         Returns
         -------
-        Full MLP for classification.
+        
         """
         super(MLP, self).__init__()
         self.num_layers = num_layers
@@ -35,14 +35,15 @@ class MLP(torch.nn.Module):
 
     def forward(self, x: torch.Tensor):
         """
+        Forward computation of the MLP.
 
         Parameters
         ----------
-        x Input for classification
+        x Input for classification.
 
         Returns
         -------
-        The result of the output layer of this module.
+        Full MLP for classification.
 
         """
         if self.num_layers > 1:

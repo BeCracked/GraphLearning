@@ -17,7 +17,7 @@ class NormalLayer(torch.nn.Module):
         """
         super(NormalLayer, self).__init__()
 
-        # Use Kaiming Init when using ReLU # TODO
+        # Use Kaiming Init when using ReLU
         self.W = torch.nn.Parameter(torch.empty(dim_in, dim_out))
         torch.nn.init.kaiming_normal_(self.W)
 
@@ -29,11 +29,11 @@ class NormalLayer(torch.nn.Module):
 
         Parameters
         ----------
-        x The node feature vectors of each graph.
+        x Input vector of the layer.
 
         Returns
         -------
-
+        Full layer.
         """
         # Apply layer
         y = torch.matmul(x, self.W) + self.b

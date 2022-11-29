@@ -27,7 +27,6 @@ def graph_objective(dataset_path: str, dataset_name: str, trial):
     Returns
     -------
     The test accuracy of the trial.
-
     """
     param = {
         "epochs": trial.suggest_int("epochs", 10, 100),
@@ -57,7 +56,6 @@ def graph_optimization(dataset_path: str, dataset_name: str, enqueue_known_best:
     Returns
     -------
     The best parameters found by the study and the resulting test accuracy.
-
     """
     objective = partial(graph_objective, dataset_path, dataset_name)
     study = optuna.create_study(direction="maximize", pruner=optuna.pruners.MedianPruner(),
@@ -90,7 +88,6 @@ def node_objective(train_path: str, test_path: str, trial):
     Returns
     -------
     The test accuracy of the trial.
-
     """
     param = {
         "epochs": trial.suggest_int("epochs", 10, 60),
@@ -120,7 +117,6 @@ def node_optimization(train_path: str, test_path: str, dataset_name: str, enqueu
     Returns
     -------
     The best parameters found by the study and the resulting test accuracy.
-
     """
     objective = partial(node_objective, train_path, test_path)
     study = optuna.create_study(direction="maximize", pruner=optuna.pruners.MedianPruner(),

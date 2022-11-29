@@ -15,7 +15,7 @@ class GCNLayer(torch.nn.Module):
         """
         super(GCNLayer, self).__init__()
 
-        # Use Kaiming Init when using ReLU # TODO
+        # Use Kaiming Init when using ReLU
         self.W = torch.nn.Parameter(torch.empty(dim_in, dim_out))
         torch.nn.init.kaiming_normal_(self.W)
 
@@ -32,7 +32,7 @@ class GCNLayer(torch.nn.Module):
 
         Returns
         -------
-
+        Full GCN layer.
         """
         # Mult adj matrices with input vertex data embedding
         o = bmm(adj_matrices, x)
