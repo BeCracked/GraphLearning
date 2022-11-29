@@ -31,6 +31,8 @@ class NodeLevelGCN(torch.nn.Module):
     def forward(self, x: torch.Tensor, adj_matrices: torch.Tensor):
         # Apply GCN network
         y = self.GCNNetwork(x, adj_matrices)
+        # Add dropout layer to avoid overfitting
+        y = torch.nn.functional.dropout(y, p=0.1, training=self.training)
         # Apply MLP classification
         y = self.MLPClassification(y)
         return y

@@ -35,6 +35,8 @@ class GraphLevelGCN(torch.nn.Module):
         y = torch.sum(y, 1, keepdim=True)
         # Remove dimensions of 1 (otherwise shape conflict)
         y = torch.squeeze(y)
+        # Add dropout layer to avoid overfitting
+        y = torch.nn.functional.dropout(y, p=0.1, training=self.training)
         # Apply MLP classification
         y = self.MLPClassification(y)
         return y
