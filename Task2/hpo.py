@@ -134,23 +134,3 @@ def node_optimization(train_path: str, test_path: str, dataset_name: str, enqueu
     study.optimize(objective, n_trials=10, timeout=6000)
 
     return study.best_params, study.best_value
-
-
-if __name__ == '__main__':
-    """
-    path, dataset = "../Task1/datasets/ENZYMES/data.pkl", "ENZYMES"
-    best_param, best_val = graph_optimization(path, dataset, True)
-    print(f"ENZYMES: Best found params:{best_param}, Accuracy:{best_val * 100:.2f}%")
-
-    path, dataset = "../Task1/datasets/NCI1/data.pkl", "NCI"
-    best_param, best_val = graph_optimization(path, dataset, True)
-    print(f"NCI: Best found params:{best_param}, Accuracy:{best_val * 100:.2f}%")
-    """
-
-    train_path, test_path, dataset = "./datasets/Citeseer_Train/data.pkl", "./datasets/Citeseer_Eval/data.pkl", "Citeseer"
-    best_param, best_val = node_optimization(train_path, test_path, dataset, True)
-    print(f"Citeseer: Best found params:{best_param}, Accuracy:{best_val * 100:.2f}%")
-
-    train_path, test_path, dataset = "./datasets/Cora_Train/data.pkl", "./datasets/Cora_Eval/data.pkl", "Cora"
-    best_param, best_val = node_optimization(train_path, test_path, dataset, True)
-    print(f"Cora: Best found params:{best_param}, Accuracy:{best_val * 100:.2f}%")

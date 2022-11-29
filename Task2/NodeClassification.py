@@ -173,13 +173,3 @@ def test(dataloader, model, loss_fn):
 def get_accuracy(pred: Tensor, truth: Tensor) -> float:
     correct = (pred.argmax(1) == truth).type(torch.float).sum().item()
     return correct / len(truth)
-
-
-if __name__ == '__main__':
-    params = {
-        "epochs": 10, "learning_rate": 1e-3
-    }
-    res = run_node_classification("datasets/Citeseer_Train/data.pkl", "datasets/Citeseer_Eval/data.pkl", device="cpu",
-                                  **params)
-
-    print(res)
