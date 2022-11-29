@@ -7,34 +7,42 @@ The python environment is described in the `requirements.txt` and can be install
 
 Files relevant to `Task2`:
 
-* `Modules` folder: Contains the PyTorch modules which form the layers and nets of the Graph Neural Networks for Graph and Node Classification.
+* `Modules` folder: contains the PyTorch modules which includes
+    * the layer components (`GCNLayer.py` and `NormalLayer.py`)
+    * the network components (`GNetwork.py` and `MLP.py`)
+    * the GCNs (`GraphLevelGCN.py` and `NodeLevelGCN.py`)
 * `datasets` folder: Contains the datasets new to Task 2 (Citeseer and Core ). Other datasets can be found in `Task1/datasets`.
 * `preprocessing.py` file: Contains methods for extracting data labels and the calculation of the normalized adjacency matrices.
 * `hpo.py` file: Contains the logic for performing hyperparameter optimization with optuna.
 * `run.py` file: Contains the argument parsing logic for the CLI.
 
 ## How To Run Scripts
-`python run.py classification dataset [--hpo]`
+From within the `Task2` directory execute
+```bash
+python run.py classification dataset [--hpo]
+```
 
-Need to specify the classification to execute `[graph,node]` and on which dataset `[ENZYMES, NCI, Citeseer, Cora]`.
-
-The flag `--hpo` specifies whether to execute hyperparameter optimization.
+| Parameter       | Possible Values                              | Default | Description                                 |
+|-----------------|----------------------------------------------|---------|---------------------------------------------|
+| `classificaton` | `"graph"`,`"node"`                           | n/a     | What to classify                            |
+| `dataset`       | `"ENZYMES"`, `"NCI"`, `"Citeseer"`, `"Cora"` | n/a     | On what dataset                             |
+| `--hpo`         | `True`, `False`                              | `False` | Whether to run Hyper Parameter Optimization |
 
 ## Evaluation Results
 
 ### Graph Classification
-|         | Train Accuracy | Test Accuracy  |
+| Dataset | Train Accuracy | Test Accuracy  |
 |---------|----------------|----------------|
 | ENZYMES | 66.61% (±8.07) | 55.01% (±5.11) |
 | NCI1    | 84.25% (±6.65) | 78.41% (±6.18) |
 
 ### Node Classification
-|          | Train Accuracy | Test Accuracy  |
+| Dataset  | Train Accuracy | Test Accuracy  |
 |----------|----------------|----------------|
 | Citeseer | 94.51% (±0.00) | 89.80% (±0.00) |
 | Cora     | 96.79% (±0.00) | 93.37% (±0.00) |
 
-### Hyper Parameter
+### Hyper Parameters
 Hyper Parameter Optimization was performed for the parameters `epochs` and `learning_rate`.
 A dictionary of the best found parameters with which the above results were obtained:
 ```json
@@ -45,4 +53,3 @@ A dictionary of the best found parameters with which the above results were obta
     "Cora": {"epochs": 43, "learning_rate": 0.037515200531228275}
 }
 ```
-
