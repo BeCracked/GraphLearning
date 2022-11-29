@@ -49,7 +49,7 @@ def load_data(path: str, dataset: str):
 
 
 def run_graph_classification(path: str, dataset_name: str, *,
-                             device: str = "cpu",
+                             device: str|None = None,
                              epochs=10, batch_size=32, learning_rate=1e-3, fold_count=10) \
         -> tuple[list, list, list, list]:
     """
@@ -72,6 +72,8 @@ def run_graph_classification(path: str, dataset_name: str, *,
 
     """
     torch.manual_seed(42)
+    if not device:
+        device = torch.device("cpu" if not torch.cuda.is_available() else "cpu")
 
     # Extract node features, adjacency matrices, labels and convert to tensors
     x, a, y, num_labels = load_data(path, dataset_name)
@@ -112,6 +114,7 @@ def run_graph_classification(path: str, dataset_name: str, *,
 
         train_accs.append(train_acc)
         train_stds.append(train_std)
+
         test_acc, test_std = test(test_loader, model, loss_fn)
         test_accs.append(test_acc)
         test_stds.append(test_std)

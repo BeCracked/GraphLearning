@@ -44,7 +44,7 @@ def load_data(path: str):
 
 
 def run_node_classification(path_train: str, path_test, *,
-                            device: str = "cpu",
+                            device: str|None = None,
                             epochs=10, learning_rate=1e-3) \
         -> tuple[list, list, list, list]:
     """
@@ -65,6 +65,8 @@ def run_node_classification(path_train: str, path_test, *,
 
     """
     torch.manual_seed(42)
+    if not device:
+        device = torch.device("cpu" if not torch.cuda.is_available() else "cpu")
 
     # Extract node features, adjacency matrices, labels and convert to tensors
     x_train, a_train, y_train, num_labels_train = load_data(path_train)
@@ -101,6 +103,7 @@ def run_node_classification(path_train: str, path_test, *,
 
         train_accs.append(train_acc)
         train_stds.append(train_std)
+
         test_acc, test_std = test(test_loader, model, loss_fn)
         test_accs.append(test_acc)
         test_stds.append(test_std)
