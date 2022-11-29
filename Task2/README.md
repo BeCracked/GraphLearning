@@ -14,7 +14,11 @@ Files relevant to `Task2`:
 * `run.py` file: Contains the argument parsing logic for the CLI.
 
 ## How To Run Scripts
+`python run.py classification dataset [--hpo]`
 
+Need to specify the classification to execute `[graph,node]` and on which dataset `[ENZYMES, NCI, Citeseer, Cora]`.
+
+The flag `--hpo` specifies whether to execute hyperparameter optimization.
 
 ## Evaluation Results
 
