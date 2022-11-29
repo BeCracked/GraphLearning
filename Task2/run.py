@@ -1,4 +1,5 @@
 import argparse as ap
+import numpy as np
 from GraphClassification import run_graph_classification
 from NodeClassification import run_node_classification
 from hpo import graph_optimization, node_optimization, best_know_params
@@ -43,7 +44,9 @@ def graph_class(dataset: str, *, hpo: bool = False):
     if hpo:
         graph_optimization(data_path, dataset)
     else:
-        run_graph_classification(data_path, dataset, **params)
+        train_accs, train_stds, test_accs, test_stds = run_graph_classification(data_path, dataset, **params)
+        print(f"Train Accuracy: {np.mean(train_accs) * 100:0.2f}%(±{np.mean(train_stds) * 100:0.2f})")
+        print(f"Test Accuracy: {np.mean(test_accs) * 100:0.2f}%(±{np.mean(test_stds) * 100:0.2f})")
 
 
 def node_class(dataset: str, *, hpo: bool = False):
@@ -67,7 +70,9 @@ def node_class(dataset: str, *, hpo: bool = False):
     if hpo:
         node_optimization(train_path, test_path, dataset)
     else:
-        run_node_classification(train_path, test_path, **params)
+        train_accs, train_stds, test_accs, test_stds = run_node_classification(train_path, test_path, **params)
+        print(f"Train Accuracy: {np.mean(train_accs)*100:0.2f}%(±{np.mean(train_stds)*100:0.2f})")
+        print(f"Test Accuracy: {np.mean(test_accs)*100:0.2f}%(±{np.mean(test_stds)*100:0.2f})")
     pass
 
 
