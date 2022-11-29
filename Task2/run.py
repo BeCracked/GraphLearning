@@ -47,7 +47,7 @@ def graph_class(dataset: str, *, hpo: bool = False):
 
 
 def node_class(dataset: str, *, hpo: bool = False):
-    dataset_dir = "./datasets/"
+    dataset_dir = "./datasets"
     train_path = None
     test_path = None
     params = {}
