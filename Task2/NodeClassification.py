@@ -10,7 +10,7 @@ from torch.utils.data.dataloader import default_collate
 from tqdm import tqdm
 
 import preprocessing
-from Task2.Modules.NodeLevelGCN import NodeLevelGCN
+from Modules.NodeLevelGCN import NodeLevelGCN
 
 QUIET = os.getenv("QUIET", default=True)
 

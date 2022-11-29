@@ -1,6 +1,6 @@
 import torch
 
-from Task2.Modules.GCNLayer import GCNLayer
+from .GCNLayer import GCNLayer
 
 
 class GNetwork(torch.nn.Module):

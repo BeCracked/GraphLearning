@@ -1,6 +1,6 @@
 import torch
 
-from Task2.Modules.NormalLayer import NormalLayer
+from .NormalLayer import NormalLayer
 
 
 class MLP(torch.nn.Module):

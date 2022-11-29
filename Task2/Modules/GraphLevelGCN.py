@@ -1,8 +1,8 @@
 import torch
 
 
-from Task2.Modules.GNetwork import GNetwork
-from Task2.Modules.MLP import MLP
+from .GNetwork import GNetwork
+from .MLP import MLP
 
 
 class GraphLevelGCN(torch.nn.Module):
@@ -36,7 +36,7 @@ class GraphLevelGCN(torch.nn.Module):
         # Remove dimensions of 1 (otherwise shape conflict)
         y = torch.squeeze(y)
         # Add dropout layer to avoid overfitting
-        y = torch.nn.functional.dropout(y, p=0.1, training=self.training)
+        y = torch.nn.functional.dropout(y, p=0.0, training=self.training)
         # Apply MLP classification
         y = self.MLPClassification(y)
         return y

@@ -37,7 +37,6 @@ class GCNLayer(torch.nn.Module):
         # Mult adj matrices with input vertex data embedding
         o = bmm(adj_matrices, x)
 
-        # TODO: Figure out dimensionality for weights
         # Expand weights vector for batch matrix multiplication
         expand_shape = (o.size()[0], self.W.size()[0], self.W.size()[1])
         w_b = self.W.expand(expand_shape)

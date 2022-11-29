@@ -176,19 +176,3 @@ def extract_node_labels_from_dataset(dataset: Iterable, label_key: str = "node_l
     The list of labels extracted from the dataset.
     """
     return [node[1] for element in dataset for node in element.nodes(data=label_key)]
-
-
-if __name__ == '__main__':
-    # from Task1.helper.graph_gen import get_random_graph
-    #
-    # for k in range(20):
-    #     G = get_random_graph(12345 + k)
-    #     m = norm_adj_matrix(G, 15)
-    #     print(len(G.nodes))
-    #     print(m.toarray())
-    #     print("####################################")
-    import pickle
-    with open("../Task1/datasets/ENZYMES/data.pkl", 'rb') as f:
-        data = pickle.load(f)
-    d = data[0]
-    print(type(d.nodes[1]["node_attributes"]))

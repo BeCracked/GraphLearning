@@ -1,8 +1,8 @@
 import torch
 
 
-from Task2.Modules.GNetwork import GNetwork
-from Task2.Modules.MLP import MLP
+from .GNetwork import GNetwork
+from .MLP import MLP
 
 
 class NodeLevelGCN(torch.nn.Module):
@@ -32,7 +32,7 @@ class NodeLevelGCN(torch.nn.Module):
         # Apply GCN network
         y = self.GCNNetwork(x, adj_matrices)
         # Add dropout layer to avoid overfitting
-        y = torch.nn.functional.dropout(y, p=0.1, training=self.training)
+        y = torch.nn.functional.dropout(y, p=0.0, training=self.training)
         # Apply MLP classification
         y = self.MLPClassification(y)
         return y

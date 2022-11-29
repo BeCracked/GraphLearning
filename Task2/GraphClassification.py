@@ -11,7 +11,7 @@ from sklearn.model_selection import KFold
 from tqdm import tqdm
 
 import preprocessing
-from Task2.Modules.GraphLevelGCN import GraphLevelGCN
+from Modules.GraphLevelGCN import GraphLevelGCN
 
 QUIET = os.getenv("QUIET", default=True)
 
