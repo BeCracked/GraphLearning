@@ -71,6 +71,8 @@ def run_graph_classification(path: str, dataset_name: str, *,
     Tuple of Lists of the form (train_accs, train_stds, test_accs, test_stds)
 
     """
+    torch.manual_seed(42)
+
     # Extract node features, adjacency matrices, labels and convert to tensors
     x, a, y, num_labels = load_data(path, dataset_name)
 
