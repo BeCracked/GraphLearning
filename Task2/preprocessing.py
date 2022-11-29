@@ -116,6 +116,12 @@ def get_node_feature_embeddings(graphs: list[nx.Graph] | np.ndarray[nx.Graph],
             for j in range(len(graphs[i]), max_number_of_nodes - len(graphs[i])):
                 embeddings[i][j].extend([0] * len_node_attribute)
 
+        # final check for padding in embeddings
+        for i in range(len(graphs)):
+            for j in range(max_number_of_nodes):
+                while len(embeddings[i][j]) < (len(node_labels) + len_node_attribute):
+                    embeddings[i][j].extend([0])
+
     # Cast to torch tensor
     embeddings = torch.Tensor(embeddings)
     return embeddings
