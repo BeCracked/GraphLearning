@@ -3,18 +3,21 @@
 ## Repository Structure
 
 The python environment is described in the `requirements.txt` and can be installed with the following command:
+
 ```pip install -r requirements.txt```
 
-Files relevant to `Task2`:
+Everything else that is relevant for the second exercise can be found in folder `Task2`:
 
 * `Modules` folder: contains the PyTorch modules which includes
-    * the layer components (`GCNLayer.py` and `NormalLayer.py`)
-    * the network components (`GNetwork.py` and `MLP.py`)
-    * the GCNs (`GraphLevelGCN.py` and `NodeLevelGCN.py`)
-* `datasets` folder: Contains the datasets new to Task 2 (Citeseer and Core ). Other datasets can be found in `Task1/datasets`.
-* `preprocessing.py` file: Contains methods for extracting data labels and the calculation of the normalized adjacency matrices.
-* `hpo.py` file: Contains the logic for performing hyperparameter optimization with optuna.
-* `run.py` file: Contains the argument parsing logic for the CLI.
+	* the layer components (`GCNLayer.py` and `NormalLayer.py`) 
+	* the network components (`GNetwork.py` and `MLP.py`)
+	* the GCNs (`GraphLevelGCN.py` and `NodeLevelGCN.py`)
+* `datasets` folder: contains the datasets new to Task 2 (Citeseer and Core ). The other datasets (NCI1 and ENZYMES) can be found in `Task1/datasets`.
+* `preprocessing.py` file: contains methods for creating the node feature embeddings and the calculation of the normalized adjacency matrices as well as label extractions.
+* `GraphClassification.py` file: contains the training and testing of the graph-level GCN.
+* `NodeClassification.py` file: contains the training and testing of the node-level GCN.
+* `hpo.py` file: contains the logic for performing hyperparameter optimization with optuna.
+* `run.py` file: contains the argument parsing logic for the CLI.
 
 ## How To Run Scripts
 From within the `Task2` directory execute
@@ -25,7 +28,7 @@ python run.py classification dataset [--hpo]
 | Parameter       | Possible Values                              | Default | Description                                 |
 |-----------------|----------------------------------------------|---------|---------------------------------------------|
 | `classificaton` | `"graph"`,`"node"`                           | n/a     | What to classify                            |
-| `dataset`       | `"ENZYMES"`, `"NCI"`, `"Citeseer"`, `"Cora"` | n/a     | On what dataset                             |
+| `dataset`       | `"ENZYMES"`, `"NCI"`, `"Citeseer"`, `"Cora"` | n/a     | On what dataset
 | `--hpo`         | `True`, `False`                              | `False` | Whether to run Hyper Parameter Optimization |
 
 ## Evaluation Results
