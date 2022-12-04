@@ -4,13 +4,13 @@ import torch
 import torch_scatter
 
 
-class SparseGNNLayer(torch.Module):
+class SparseGNNLayer(torch.nn.Module):
     def __init__(self, M_dim_in: int, M_dim_out: int, U_dim_in: int, U_dim_out: int, *, aggregation: Literal["SUM", "MEAN", "MAX"] | str):
         super().__init__()
 
         self.aggregation = aggregation
 
-        # Setup functions M and U TODO: Apply MLP? Do we need hidden layers?
+        # Setup M and U as trainable MLPs TODO: Apply MLP? Do we need hidden layers?
         self.M = torch.nn.Sequential(
             torch.nn.Linear(M_dim_in, M_dim_out),
             torch.nn.ReLU()
@@ -42,4 +42,5 @@ class SparseGNNLayer(torch.Module):
         U_con_cat = torch.cat([H, Z], dim=1)
         # Apply MLP
         H_next = self.U(U_con_cat)
+
         return H_next

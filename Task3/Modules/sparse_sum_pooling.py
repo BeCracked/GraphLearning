@@ -2,7 +2,7 @@ import torch
 import torch_scatter
 
 
-class SparseSumPooling(torch.Module):
+class SparseSumPooling(torch.nn.Module):
     def __init__(self):
         super().__init__()
 
