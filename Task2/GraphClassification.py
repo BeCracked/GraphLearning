@@ -76,7 +76,7 @@ def run_graph_classification(path: str, dataset_name: str, *,
     """
     torch.manual_seed(42)
     if not device:
-        device = torch.device("cpu" if not torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Extract node features, adjacency matrices, labels and convert to tensors
     x, a, y, num_labels = load_data(path, dataset_name)

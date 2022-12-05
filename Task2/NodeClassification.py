@@ -70,7 +70,7 @@ def run_node_classification(path_train: str, path_test: str, *,
     """
     torch.manual_seed(42)
     if not device:
-        device = torch.device("cpu" if not torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Extract node features, adjacency matrices, labels and convert to tensors
     x_train, a_train, y_train, num_labels_train = load_data(path_train)
