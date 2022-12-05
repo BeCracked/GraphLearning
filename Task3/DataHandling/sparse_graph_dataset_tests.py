@@ -7,15 +7,15 @@ from numpy.random import randint
 from sparse_graph_dataset import SparseGraphDataset
 
 import pytest
-from pytest import fixture
 
-full_settings = {
-    "node_feature_key": "node_label",
-    "edge_feature_key": "edge_label",
-    "graph_feature_key": "label",
+from Task3.configurations import zinc_base_params
+
+gen_settings = {
     "min_node_count": 5,
     "max_node_count": 20,
 }
+full_settings = zinc_base_params.copy()
+full_settings.update(gen_settings)
 
 
 @pytest.mark.parametrize("random_seeds", [[12345, 67890, 1029384756]])
