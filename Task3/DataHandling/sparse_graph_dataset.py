@@ -92,11 +92,7 @@ if __name__ == '__main__':
         data = edge_labels_to_one_hot(pickle.load(f))
 
     dataset = SparseGraphDataset(data, **zinc_base_params)
-    reps = []
-    for rp in dataset:
-        reps.append(rp)
-    sparse_graph_collation(reps)
-    dl = DataLoader(dataset, collate_fn=sparse_graph_collation)
+    dl = DataLoader(dataset, collate_fn=sparse_graph_collation, batch_size=10)
 
     e = time.perf_counter()
 
