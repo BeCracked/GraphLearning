@@ -17,7 +17,7 @@ class NormalLayer(torch.nn.Module):
         """
         super(NormalLayer, self).__init__()
 
-        # Use Kaiming Init when using ReLU
+        # Use t when using ReLU
         self.W = torch.nn.Parameter(torch.empty(dim_in, dim_out))
         torch.nn.init.kaiming_normal_(self.W)
 

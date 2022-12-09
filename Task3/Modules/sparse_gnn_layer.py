@@ -5,7 +5,8 @@ import torch_scatter
 
 
 class SparseGNNLayer(torch.nn.Module):
-    def __init__(self, M_dim_in: int, M_dim_out: int, U_dim_in: int, U_dim_out: int, *, aggregation: Literal["SUM", "MEAN", "MAX"], drop_prob: float):
+    def __init__(self, M_dim_in: int, M_dim_out: int, U_dim_in: int, U_dim_out: int, *,
+                 aggregation: Literal["SUM", "MEAN", "MAX"], drop_prob: float):
         super().__init__()
 
         self.aggregation = aggregation

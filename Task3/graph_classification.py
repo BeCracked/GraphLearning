@@ -15,7 +15,7 @@ from DataHandling.sparse_graph_dataset import SparseGraphDataset, sparse_graph_c
 QUIET = os.getenv("QUIET", default=True)
 
 
-def run_graph_classification(train_data_path: str, test_data_path: str, *,
+def run_graph_regression(train_data_path: str, test_data_path: str, *,
                              device: Optional[str] = None,
                              epochs=10, learning_rate=1e-30, **config) -> tuple[float, float]:
     """
@@ -43,9 +43,12 @@ def run_graph_classification(train_data_path: str, test_data_path: str, *,
     # Load data
     train_loader = get_data_loader(train_data_path, **config)
     test_loader = get_data_loader(test_data_path, **config)
+    # todo: load validation set
 
     # Create model
     model: torch.Module = None  # TODO: Create model class from torch.Module (remember to use **config)
+    # Todo: frage, An dieser Stelle das graph regression model erzeugen?
+    # In alter Abgabe:  model = GraphLevelGCN(input_dim=len(x[0][0]), output_dim=num_labels, hidden_dim=64)
     model.train()
     model.to(device)
 
@@ -57,6 +60,7 @@ def run_graph_classification(train_data_path: str, test_data_path: str, *,
     train_acc, train_std = 0, 0
     for epoch in tqdm(range(epochs), disable=QUIET):
         train_acc, train_std = train_loop(train_loader, model, loss_fn, opt)  # Consider only accuracy of last epoch
+        # todo: use validation set to compute MAE and save it to report it in the readme file
 
     test_acc, test_std = test_loop(test_loader, model)
 
