@@ -60,8 +60,16 @@ class SparseGraphDataset(Dataset):
 def sparse_graph_collation(sparse_reps: list[SparseGraphRep]):
     edge_features_flag: bool = sparse_reps[0].edge_features is not None and sparse_reps[0].edge_features._nnz() > 0
 
-    edge_list = torch.cat([r.edge_list for r in sparse_reps], dim=1)
     node_features = torch.cat([r.node_features for r in sparse_reps])
+    # Index of node in node_features
+    edge_list = sparse_reps[0].edge_list
+    offset = len(sparse_reps[0].node_features)
+    for rep in sparse_reps[1:]:
+        # Get offset for node indices
+        offset += len(rep.node_features)
+        partial_edge_list = torch.add(rep.edge_list, offset)
+        edge_list = torch.cat([edge_list, partial_edge_list], dim=1)
+
     edge_features = None
     if edge_features_flag:
         edge_features = torch.cat([r.edge_features for r in sparse_reps])
