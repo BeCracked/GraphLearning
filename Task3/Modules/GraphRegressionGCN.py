@@ -1,12 +1,10 @@
 import torch
-
-from .RNetwork import RNetwork
-from .MLP import MLP
+from RNetwork import RNetwork
 
 
 class GraphRegressionGCN(torch.nn.Module):
-    def __init__(self, int, m_dim_out: int, u_dim_in: int, u_dim_out: int,input_dim: int, output_dim: int,
-                 hidden_dim: int, num_layers: int, agg_type: str, v_nodes: bool, drop_prob: int):
+    def __init__(self, hidden_dim: int, num_layers: int, agg_type: str, v_nodes: bool,
+                 drop_prob: int, node_feature_dimension: int, edge_feature_dimension: int):
         """
         Construct the graph-regression GCN according to Exercise 3.6.
 
@@ -21,7 +19,7 @@ class GraphRegressionGCN(torch.nn.Module):
         hidden_dim Dimension of hidden layers.
         depth Total number of layers.
         agg_type Type of aggregation function used ("SUM", "MEAN", or "MAX").
-        v_nodes Should virutal nodes be used (yes or no).
+        v_nodes Should virtual nodes be used (yes or no).
 
 
         Returns
@@ -30,12 +28,9 @@ class GraphRegressionGCN(torch.nn.Module):
         """
         super(GraphRegressionGCN, self).__init__()
 
-        # Setup Network of 5 GCN layers and hidden dimension of 64
-        # TODO: anpassen an exercise 3.6
-        self.GCNNetwork = RNetwork(input_dim, hidden_dim, hidden_dim, 5)
-
-        # Setup MLP classification (one hidden layer of dimension 64, one linear output layer)
-        self.MLPClassification = MLP(hidden_dim, output_dim, hidden_dim, 2)
+        self.GNN = RNetwork(hidden_dim=hidden_dim, agg_type=agg_type, virtual_node=v_nodes, drop_prob=drop_prob,
+                            node_feature_dimension=node_feature_dimension, edge_feature_dimension=edge_feature_dimension,
+                            layer_count=num_layers)
 
     def forward(self, x: torch.Tensor, adj_matrices: torch.Tensor):
         """

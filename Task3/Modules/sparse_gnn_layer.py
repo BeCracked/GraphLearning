@@ -4,30 +4,23 @@ import torch
 import torch_scatter
 
 
+# noinspection PyPep8Naming
 class SparseGNNLayer(torch.nn.Module):
     def __init__(self, M_dim_in: int, M_dim_out: int, U_dim_in: int, U_dim_out: int, *,
-                 aggregation: Literal["SUM", "MEAN", "MAX"], drop_prob: float):
+                 aggregation: Literal["SUM", "MEAN", "MAX"], drop_prob: float, **config):
         super().__init__()
 
         self.aggregation = aggregation
 
         # Setup M and U as trainable MLPs TODO: Apply MLP? Do we need hidden layers?
+
         self.M = torch.nn.Sequential(
             torch.nn.Linear(M_dim_in, M_dim_out),
-            torch.nn.ReLU()
-        )
-
-        """
-        self.register_parameter("M", torch.nn.Sequential(
-            torch.nn.Linear(M_dim_in, M_dim_out),
             torch.nn.ReLU())
-                                )
-        """
 
         self.U = torch.nn.Sequential(
             torch.nn.Linear(U_dim_in, U_dim_out),
-            torch.nn.ReLU()
-        )
+            torch.nn.ReLU())
 
         # Dropout probability
         self.drop_prob = drop_prob

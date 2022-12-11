@@ -7,18 +7,21 @@ import pickle
 
 from torch import Tensor
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 import DataHandling.preprocessing as preprocessing
 from DataHandling.sparse_graph_dataset import SparseGraphDataset, sparse_graph_collation
+from Modules.GraphRegressionGCN import GraphRegressionGCN
+from Modules.RNetwork import RNetwork
+
+from tqdm import tqdm
 
 QUIET = os.getenv("QUIET", default=True)
 
 
-
-
 def run_graph_regression(train_data_path: str, test_data_path: str, validation_data_path: str, *,
-                         device: Optional[str] = None, epochs=10, learning_rate=1e-30, **config) -> tuple[float, float]:
+                         device: Optional[str] = None, epochs=10, learning_rate=1e-30,
+                         hidden_dim: int, agg_type: str, v_nodes: bool, drop_prob: int, node_feature_dimension: int,
+                         edge_feature_dimension: int, num_layers: int, **config) -> tuple[float, float]:
     """
     Performs k-fold cross validation with the graph classification net on the given dataset.
 
@@ -47,25 +50,48 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
     validation_loader = get_data_loader(test_data_path, **config)
 
     # Create model
-    model: torch.Module = None
-    # TODO: Create model class from torch.Module (remember to use **config)
+
+    model = RNetwork(hidden_dim=hidden_dim, agg_type=agg_type, virtual_node=v_nodes, drop_prob=drop_prob,
+                     node_feature_dimension=node_feature_dimension, edge_feature_dimension=edge_feature_dimension,
+                     layer_count=num_layers, **config)
+
     model.train()
     model.to(device)
 
     # Construct optimizer
-    # TODO: set loss function to l1-loss (i.e. absolute error)
     opt = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    loss_fn = torch.nn.functional.cross_entropy
+    loss_fn = torch.nn.functional.l1_loss()
 
     # Train model
-    train_acc, train_std = 0, 0
+    train_mae = val_mae = 0
+    best_val_mae = 0
+    best_model = None
     for epoch in tqdm(range(epochs), disable=QUIET):
-        train_acc, train_std = train_loop(train_loader, model, loss_fn, opt)  # Consider only accuracy of last epoch
-        # todo: use validation set to compute MAE and save it to report it in the readme file
+        model.train()
+        train_mae = train_loop(train_loader, model, loss_fn, opt)  # Consider only accuracy of last epoch
+        model.eval()
+        val_mae = validation(validation_loader, model, loss_fn)
+        if best_val_mae == 0:
+            best_val_mae = val_mae
+            best_model = model.state_dict()
+        elif val_mae < best_val_mae:
+            best_val_mae = val_mae
+            best_model = model.state_dict()
 
-    test_acc, test_std = test_loop(test_loader, model)
+    model.eval()
+    test_mae = validation(test_loader, model, loss_fn)
 
-    return train_acc, test_acc
+    return train_mae, best_val_mae, test_mae
+
+
+def validation(dataloader, model, loss_fn):
+    absolute_error = 0
+    for batch, (idx_E, x_V, x_E, y_train) in enumerate(dataloader):
+        y_pred = model(idx_E, x_V, x_E)
+        loss = loss_fn(y_pred, y_train)
+        absolute_error += loss
+
+    return abs(absolute_error/len(dataloader))
 
 
 def get_data_loader(path: str, **config) -> DataLoader:
@@ -104,7 +130,7 @@ def train_loop(dataloader, model, loss_fn, optimizer):
     -------
     The list of accuracy values for each batch.
     """
-    accuracies = np.zeros(len(dataloader))
+    absolute_error = 0
     for batch, (idx_E, x_V, x_E, y_train) in enumerate(dataloader):
         # Set gradients to zero
         optimizer.zero_grad()
@@ -112,30 +138,13 @@ def train_loop(dataloader, model, loss_fn, optimizer):
         # Forward pass and loss
         y_pred = model(idx_E, x_V, x_E)
         loss = loss_fn(y_pred, y_train)
-
+        absolute_error += loss
         # Backward pass and sgd step
         loss.backward()
         optimizer.step()
 
-        # Record accuracy
-        accuracies[batch] = get_accuracy(y_pred, y_train)
+    return abs(absolute_error/len(dataloader))
 
-    return accuracies.mean(), accuracies.std()
-
-
-def test_loop(dataloader, model):
-    accuracies = np.zeros(len(dataloader))
-    with torch.no_grad():
-        for batch, (x_test, a_test, y_test) in enumerate(dataloader):
-            y_pred = model(x_test, a_test)
-            accuracies[batch] = get_accuracy(y_pred, y_test)
-
-    return accuracies.mean(), accuracies.std()
-
-
-def get_accuracy(pred: Tensor, truth: Tensor) -> float:
-    correct = (pred.argmax(1) == truth).type(torch.float).sum().item()
-    return correct / len(truth)
 
 
 if __name__ == '__main__':
