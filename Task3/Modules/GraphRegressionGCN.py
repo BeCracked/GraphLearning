@@ -31,7 +31,7 @@ class GraphRegressionGCN(torch.nn.Module):
         super(GraphRegressionGCN, self).__init__()
 
         # Setup Network of 5 GCN layers and hidden dimension of 64
-        # TODO: anpassen an exercise 3
+        # TODO: anpassen an exercise 3.6
         self.GCNNetwork = RNetwork(input_dim, hidden_dim, hidden_dim, 5)
 
         # Setup MLP classification (one hidden layer of dimension 64, one linear output layer)

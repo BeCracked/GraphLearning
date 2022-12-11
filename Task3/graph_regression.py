@@ -15,9 +15,10 @@ from DataHandling.sparse_graph_dataset import SparseGraphDataset, sparse_graph_c
 QUIET = os.getenv("QUIET", default=True)
 
 
-def run_graph_regression(train_data_path: str, test_data_path: str, *,
-                             device: Optional[str] = None,
-                             epochs=10, learning_rate=1e-30, **config) -> tuple[float, float]:
+
+
+def run_graph_regression(train_data_path: str, test_data_path: str, validation_data_path: str, *,
+                         device: Optional[str] = None, epochs=10, learning_rate=1e-30, **config) -> tuple[float, float]:
     """
     Performs k-fold cross validation with the graph classification net on the given dataset.
 
@@ -43,16 +44,16 @@ def run_graph_regression(train_data_path: str, test_data_path: str, *,
     # Load data
     train_loader = get_data_loader(train_data_path, **config)
     test_loader = get_data_loader(test_data_path, **config)
-    # todo: load validation set
+    validation_loader = get_data_loader(test_data_path, **config)
 
     # Create model
-    model: torch.Module = None  # TODO: Create model class from torch.Module (remember to use **config)
-    # Todo: frage, An dieser Stelle das graph regression model erzeugen?
-    # In alter Abgabe:  model = GraphLevelGCN(input_dim=len(x[0][0]), output_dim=num_labels, hidden_dim=64)
+    model: torch.Module = None
+    # TODO: Create model class from torch.Module (remember to use **config)
     model.train()
     model.to(device)
 
     # Construct optimizer
+    # TODO: set loss function to l1-loss (i.e. absolute error)
     opt = torch.optim.Adam(model.parameters(), lr=learning_rate)
     loss_fn = torch.nn.functional.cross_entropy
 

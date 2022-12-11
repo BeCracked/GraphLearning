@@ -583,6 +583,17 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "torch-scatter"
+version = "2.1.0"
+description = "PyTorch Extension Library of Optimized Scatter Operations"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+test = ["pytest", "pytest-cov"]
+
+[[package]]
 name = "tqdm"
 version = "4.64.1"
 description = "Fast, Extensible Progress Meter"
@@ -630,7 +641,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.10"
-content-hash = "f1eda7cb49e33d879245869e51eecbf478f977c0fdfdebd898c3b84b5fa82746"
+content-hash = "d692b298a9a0d0985a05954af10cdfcba346e25f972f8bddd62e0276e74f1b25"
 
 [metadata.files]
 alembic = [
@@ -1281,6 +1292,9 @@ threadpoolctl = [
 tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
+]
+torch-scatter = [
+    {file = "torch_scatter-2.1.0.tar.gz", hash = "sha256:3a7124c2a033552febbdc72407f7d4d8cb6dce465720e84ab831512e81c1d208"},
 ]
 tqdm = [
     {file = "tqdm-4.64.1-py2.py3-none-any.whl", hash = "sha256:6fee160d6ffcd1b1c68c65f14c829c22832bc401726335ce92c52d395944a6a1"},

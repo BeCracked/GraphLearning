@@ -17,6 +17,13 @@ class SparseGNNLayer(torch.nn.Module):
             torch.nn.ReLU()
         )
 
+        """
+        self.register_parameter("M", torch.nn.Sequential(
+            torch.nn.Linear(M_dim_in, M_dim_out),
+            torch.nn.ReLU())
+                                )
+        """
+
         self.U = torch.nn.Sequential(
             torch.nn.Linear(U_dim_in, U_dim_out),
             torch.nn.ReLU()
@@ -48,5 +55,5 @@ class SparseGNNLayer(torch.nn.Module):
         H_next = self.U(U_con_cat)
         # Apply dropout
         H_drop = torch.nn.functional.dropout(H_next, p=self.drop_prob, training=self.training)
-
+        # TODO: apply global pooling by using virtual nodes if the parameters say so
         return H_drop
