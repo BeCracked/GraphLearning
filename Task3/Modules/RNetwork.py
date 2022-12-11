@@ -6,9 +6,10 @@ from Task3.Modules.virtual_node import VirtualNode
 from Task3.Modules.sparse_sum_pooling import SparseSumPooling
 
 
+# noinspection PyPep8Naming
 class RNetwork(torch.nn.Module):
     def __init__(self, node_feature_dimension: int, edge_feature_dimension: int, *,
-                 hidden_dim: int, virtual_node: bool, layer_count: int, **config):
+                 hidden_dim: int, virtual_node: bool, layer_count: int, drop_prob: float = 0, **config):
         """
         Creates a network of GCN layers.
 
@@ -30,19 +31,23 @@ class RNetwork(torch.nn.Module):
 
         super(RNetwork, self).__init__()
         self.num_layers = layer_count
-        self.v_nodes = virtual_node
+        self.virtual_node = virtual_node
+        self.drop_prob = drop_prob
 
         # Setup input layer
         self.input_layer = SparseGNNLayer(node_feature_dimension + edge_feature_dimension, hidden_dim,
-                                          hidden_dim+node_feature_dimension, hidden_dim, **config)
+                                          hidden_dim+node_feature_dimension, hidden_dim,
+                                          drop_prob=drop_prob, **config)
 
         # Setup hidden layers in ModuleList
         self.hidden_layers = torch.nn.ModuleList(
-            [SparseGNNLayer(hidden_dim+edge_feature_dimension, hidden_dim, 2*hidden_dim, hidden_dim, **config)
+            [SparseGNNLayer(hidden_dim+edge_feature_dimension, hidden_dim,
+                            2*hidden_dim, hidden_dim,
+                            drop_prob=drop_prob, **config)
              for _ in range(layer_count - 1)]
         )
 
-        if self.v_nodes:
+        if self.virtual_node:
             self.virtual_node = torch.nn.ModuleList(
                 [VirtualNode(hidden_dim, hidden_dim) for _ in range(layer_count - 1)]
             )
@@ -66,16 +71,18 @@ class RNetwork(torch.nn.Module):
         """
         # apply layers
         y = self.input_layer(H, Xe, id_Xe)
-        if self.v_nodes:
+        if self.virtual_node:
             y = self.virtual_node(y, batch_idx)
 
         for i in range(self.num_layers - 1):
             y = self.hidden_layers[i](y, Xe, id_Xe)
-            if self.v_nodes:
+            if self.virtual_node:
                 y = self.virtual_node(y, batch_idx)
         y = self.global_pool(y, batch_idx)
         # Add dropout layer to avoid overfitting
-        y = torch.nn.functional.dropout(y, p=0.0, training=self.training)
+        y = torch.nn.functional.dropout(y, p=self.drop_prob, training=self.training)
+        y = self.dropout(y)
+
         # Apply MLP Classification
         y = self.MLP(y)
 
