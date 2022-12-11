@@ -103,6 +103,7 @@ def get_data_loader(path: str, *, batch_size: int = 128, **config) -> DataLoader
     """
     with open(path, 'rb') as f:
         data = preprocessing.edge_labels_to_one_hot(pickle.load(f))
+        data = preprocessing.node_labels_to_one_hot(data)
 
     dataset = SparseGraphDataset(data, **config)
     dataloader = DataLoader(dataset, collate_fn=sparse_graph_collation, batch_size=batch_size)
