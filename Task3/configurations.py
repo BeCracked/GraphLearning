@@ -17,5 +17,6 @@ zinc_base_params = {
     "edge_feature_dimension": 3,
 
     "epoch_count": 10,
-    "learning_rate": 1e-30
+    "learning_rate": 1e-30,
+    "batch_size": 128
 }

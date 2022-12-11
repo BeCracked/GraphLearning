@@ -89,7 +89,7 @@ def validation(dataloader, model, loss_fn):
     return abs(absolute_error / len(dataloader))
 
 
-def get_data_loader(path: str, **config) -> DataLoader:
+def get_data_loader(path: str, *, batch_size: int = 128, **config) -> DataLoader:
     """
     Load graphs of dataset, apply normalization to adjacency matrices and extract labels.
     ----------
@@ -105,7 +105,7 @@ def get_data_loader(path: str, **config) -> DataLoader:
         data = preprocessing.edge_labels_to_one_hot(pickle.load(f))
 
     dataset = SparseGraphDataset(data, **config)
-    dataloader = DataLoader(dataset, collate_fn=sparse_graph_collation)
+    dataloader = DataLoader(dataset, collate_fn=sparse_graph_collation, batch_size=batch_size)
 
     return dataloader
 
