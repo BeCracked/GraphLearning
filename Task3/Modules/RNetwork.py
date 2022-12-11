@@ -1,9 +1,9 @@
 import torch
 
 
-from sparse_gnn_layer import SparseGNNLayer
-from virtual_node import VirtualNode
-from sparse_sum_pooling import SparseSumPooling
+from Task3.Modules.sparse_gnn_layer import SparseGNNLayer
+from Task3.Modules.virtual_node import VirtualNode
+from Task3.Modules.sparse_sum_pooling import SparseSumPooling
 
 
 class RNetwork(torch.nn.Module):

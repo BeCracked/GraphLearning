@@ -9,8 +9,13 @@ zinc_base_params = {
 
     "hidden_dim": 64,
     "aggregation": "SUM",
-    "drop_out": 0.05,
+    "drop_prob": 0.05,
     "virtual_node": True,
     "layer_count": 4,
 
+    "node_feature_dimension": 21,
+    "edge_feature_dimension": 3,
+
+    "epoch_count": 10,
+    "learning_rate": 1e-30
 }

@@ -1,5 +1,5 @@
 import torch
-from RNetwork import RNetwork
+from Task3.Modules.RNetwork import RNetwork
 
 
 class GraphRegressionGCN(torch.nn.Module):

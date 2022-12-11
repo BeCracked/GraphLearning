@@ -1,6 +1,6 @@
 import torch
 
-from sparse_sum_pooling import SparseSumPooling
+from Task3.Modules.sparse_sum_pooling import SparseSumPooling
 
 
 class VirtualNode(torch.nn.Module):

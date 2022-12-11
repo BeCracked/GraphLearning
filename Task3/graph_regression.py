@@ -1,16 +1,13 @@
 import os
 from typing import Optional
 
-import numpy as np
 import torch
 import pickle
 
-from torch import Tensor
 from torch.utils.data import DataLoader
 
 import DataHandling.preprocessing as preprocessing
 from DataHandling.sparse_graph_dataset import SparseGraphDataset, sparse_graph_collation
-from Modules.GraphRegressionGCN import GraphRegressionGCN
 from Modules.RNetwork import RNetwork
 
 from tqdm import tqdm
@@ -20,8 +17,7 @@ QUIET = os.getenv("QUIET", default=True)
 
 def run_graph_regression(train_data_path: str, test_data_path: str, validation_data_path: str, *,
                          device: Optional[str] = None, epochs=10, learning_rate=1e-30,
-                         hidden_dim: int, agg_type: str, v_nodes: bool, drop_prob: int, node_feature_dimension: int,
-                         edge_feature_dimension: int, num_layers: int, **config) -> tuple[float, float]:
+                         **config) -> tuple[float, float]:
     """
     Performs k-fold cross validation with the graph classification net on the given dataset.
 
@@ -49,18 +45,17 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
     test_loader = get_data_loader(test_data_path, **config)
     validation_loader = get_data_loader(test_data_path, **config)
 
-    # Create model
+    # TODO: Extract node/edge feature dimension
 
-    model = RNetwork(hidden_dim=hidden_dim, agg_type=agg_type, virtual_node=v_nodes, drop_prob=drop_prob,
-                     node_feature_dimension=node_feature_dimension, edge_feature_dimension=edge_feature_dimension,
-                     layer_count=num_layers, **config)
+    # Create model
+    model = RNetwork(**config)
 
     model.train()
     model.to(device)
 
     # Construct optimizer
     opt = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    loss_fn = torch.nn.functional.l1_loss()
+    loss_fn = torch.nn.functional.l1_loss
 
     # Train model
     train_mae = val_mae = 0
@@ -91,7 +86,7 @@ def validation(dataloader, model, loss_fn):
         loss = loss_fn(y_pred, y_train)
         absolute_error += loss
 
-    return abs(absolute_error/len(dataloader))
+    return abs(absolute_error / len(dataloader))
 
 
 def get_data_loader(path: str, **config) -> DataLoader:
@@ -131,22 +126,23 @@ def train_loop(dataloader, model, loss_fn, optimizer):
     The list of accuracy values for each batch.
     """
     absolute_error = 0
-    for batch, (idx_E, x_V, x_E, y_train) in enumerate(dataloader):
+    for batch, (batch_idx, idx_E, H, x_E, y_train) in enumerate(dataloader):
         # Set gradients to zero
         optimizer.zero_grad()
 
         # Forward pass and loss
-        y_pred = model(idx_E, x_V, x_E)
+        y_pred = model(H, x_E, idx_E, batch_idx)
         loss = loss_fn(y_pred, y_train)
         absolute_error += loss
         # Backward pass and sgd step
         loss.backward()
         optimizer.step()
 
-    return abs(absolute_error/len(dataloader))
-
+    return abs(absolute_error / len(dataloader))
 
 
 if __name__ == '__main__':
     from Task3.configurations import zinc_base_params
-    run_graph_classification("datasets/ZINC_Train/data.pkl", "datasets/ZINC_Test/data.pkl", **zinc_base_params)
+
+    run_graph_regression("datasets/ZINC_Train/data.pkl", "datasets/ZINC_Test/data.pkl", "datasets/ZINC_Val/data.pkl",
+                         device="cpu", **zinc_base_params)
