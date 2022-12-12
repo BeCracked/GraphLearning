@@ -66,9 +66,9 @@ def sparse_graph_collation(sparse_reps: list[SparseGraphRep]):
     offset = len(sparse_reps[0].node_features)
     for rep in sparse_reps[1:]:
         # Get offset for node indices
-        offset += len(rep.node_features)
         partial_edge_list = torch.add(rep.edge_list, offset)
         edge_list = torch.cat([edge_list, partial_edge_list], dim=1)
+        offset += len(rep.node_features)
 
     edge_features = None
     if edge_features_flag:
