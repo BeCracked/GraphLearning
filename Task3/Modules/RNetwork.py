@@ -48,7 +48,7 @@ class RNetwork(torch.nn.Module):
         )
 
         if self.virtual_node:
-            self.virtual_node = torch.nn.ModuleList(
+            self.virtual_nodes = torch.nn.ModuleList(
                 [VirtualNode(hidden_dim, hidden_dim) for _ in range(layer_count - 1)]
             )
 
@@ -72,16 +72,14 @@ class RNetwork(torch.nn.Module):
         # apply layers
         y = self.input_layer(H, Xe, id_Xe)
         if self.virtual_node:
-            y = self.virtual_node(y, batch_idx)
+            y = self.virtual_nodes[0](y, batch_idx)
 
         for i in range(self.num_layers - 1):
             y = self.hidden_layers[i](y, Xe, id_Xe)
-            if self.virtual_node:
-                y = self.virtual_node(y, batch_idx)
+            # do not add virtual node after last layer
+            if self.virtual_node and i < self.num_layers - 2:
+                y = self.virtual_nodes[i + 1](y, batch_idx)
         y = self.global_pool(y, batch_idx)
-        # Add dropout layer to avoid overfitting
-        y = torch.nn.functional.dropout(y, p=self.drop_prob, training=self.training)
-        y = self.dropout(y)
 
         # Apply MLP Classification
         y = self.MLP(y)

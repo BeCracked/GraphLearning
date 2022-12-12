@@ -43,7 +43,8 @@ class SparseGraphDataset(Dataset):
             self.edge_lists[i] = idx
 
             if edge_feature_key:
-                self.edge_features[i] = torch.tensor(v, device=device).to_sparse_coo()
+                # self.edge_features[i] = torch.tensor(v, device=device).to_sparse_coo()
+                self.edge_features[i] = torch.tensor(v, device=device)
 
             # Graph Labels
             if graph_feature_key:
@@ -58,7 +59,8 @@ class SparseGraphDataset(Dataset):
 
 
 def sparse_graph_collation(sparse_reps: list[SparseGraphRep]):
-    edge_features_flag: bool = sparse_reps[0].edge_features is not None and sparse_reps[0].edge_features._nnz() > 0
+    # edge_features_flag: bool = sparse_reps[0].edge_features is not None and sparse_reps[0].edge_features._nnz() > 0
+    edge_features_flag = True
 
     node_features = torch.cat([r.node_features for r in sparse_reps])
     # Index of node in node_features
@@ -84,6 +86,10 @@ def sparse_graph_collation(sparse_reps: list[SparseGraphRep]):
         for i in range(start, end):
             batch_idx[i] = int(g_idx)
         b_i = end
+
+    node_features = node_features.float()
+    edge_features = edge_features.float()
+    batch_idx = batch_idx.long()
 
     collated_rep = SparseGraphRep(edge_list, node_features, edge_features, graph_labels)
 
