@@ -16,7 +16,9 @@ def edge_labels_to_one_hot(graphs: List[nx.Graph], *, edge_feature_key="edge_lab
     A copy of graphs with the edge labels transformed to a one hot encoding representation.
 
     """
-    edge_labels = get_edge_labels(graphs)
+    # edge_labels = get_edge_labels(graphs)
+    # We have edge labels 1, 2, 3
+    edge_labels = list(range(1, 4))
     new_graphs = []
     for graph in graphs:
         new_labels = dict()
@@ -48,7 +50,9 @@ def node_labels_to_one_hot(graphs: List[nx.Graph], *, node_feature_key="node_lab
     A copy of graphs with the node labels transformed to a one hot encoding representation.
 
     """
-    node_labels = get_node_labels(graphs)
+    # node_labels = get_node_labels(graphs)
+    # We have node labels 0 to 20
+    node_labels = list(range(21))
     new_graphs = []
     for graph in graphs:
         new_labels = dict()
@@ -65,24 +69,6 @@ def node_labels_to_one_hot(graphs: List[nx.Graph], *, node_feature_key="node_lab
         new_graphs.append(new_graph)
 
     return new_graphs
-
-
-def get_node_labels(graphs: List[nx.Graph]):
-    labels = set()
-    for graph in graphs:
-        for node in graph.nodes(data=True):
-            labels.add(node[1]["node_label"])
-
-    return list(labels)
-
-
-def get_edge_labels(graphs: List[nx.Graph]):
-    labels = set()
-    for graph in graphs:
-        for edge in graph.edges(data=True):
-            labels.add(edge[2]["edge_label"])
-
-    return list(labels)
 
 
 if __name__ == '__main__':

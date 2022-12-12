@@ -83,6 +83,8 @@ def validation(dataloader, model, loss_fn):
     absolute_error = 0
     for batch, (batch_idx, idx_E, H, x_E, y_train) in enumerate(dataloader):
         y_pred = model(H, x_E, idx_E, batch_idx)
+        # to remove unnecessary dimension
+        y_pred = torch.squeeze(y_pred)
         loss = loss_fn(y_pred, y_train)
         absolute_error += loss
 
@@ -133,6 +135,8 @@ def train_loop(dataloader, model, loss_fn, optimizer):
 
         # Forward pass and loss
         y_pred = model(H, x_E, idx_E, batch_idx)
+        # to remove unnecessary dimension
+        y_pred = torch.squeeze(y_pred)
         loss = loss_fn(y_pred, y_train)
         absolute_error += loss
         # Backward pass and sgd step
