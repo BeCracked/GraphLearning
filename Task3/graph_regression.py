@@ -81,8 +81,8 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
 
 def validation(dataloader, model, loss_fn):
     absolute_error = 0
-    for batch, (idx_E, x_V, x_E, y_train) in enumerate(dataloader):
-        y_pred = model(idx_E, x_V, x_E)
+    for batch, (batch_idx, idx_E, H, x_E, y_train) in enumerate(dataloader):
+        y_pred = model(H, x_E, idx_E, batch_idx)
         loss = loss_fn(y_pred, y_train)
         absolute_error += loss
 
