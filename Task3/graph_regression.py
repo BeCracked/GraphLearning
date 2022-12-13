@@ -77,10 +77,6 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
             torch.save(model.state_dict(), path2)
             foo = True
             best_number_of_epochs = epoch
-        elif val_mae < best_val_mae + 0.001:
-            path2 = os.path.abspath(os.getcwd()) + "/best_model" + str(epoch)
-            best_val_mae = val_mae
-            torch.save(model.state_dict(), path2)
     if foo:
         selected_model = RNetwork(**config)
         path3 = os.path.abspath(os.getcwd()) + "/best_model"

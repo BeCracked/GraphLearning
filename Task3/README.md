@@ -30,13 +30,47 @@ From within the `Task3` directory execute:
 | ZINC    |                |                 |             |
 
 ### Hyper Parameters
-Hyper Parameter Optimization was performed for the parameters `epochs` and `learning_rate`.
-A dictionary of the best found parameters with which the above results were obtained:
-```json
-{
-    "NCI": {"epochs": 55, "learning_rate": 0.001961282945941816},
-    "ENZYMES": {"epochs": 60, "learning_rate": 0.0051646504688932955},
-    "Citeseer": {"epochs": 57, "learning_rate": 0.016245162317569194},
-    "Cora": {"epochs": 43, "learning_rate": 0.037515200531228275}
-}
+Hyper Parameter Optimization was performed for the parameters `epochs`, `learning_rate`, `hidden dimension`, 
+`number of layers`, `virtual nodes`, `batch size`, `aggregation type`.
+
+For each hyperparameter we evaluated values within the following ranges:
+
+| Parameter          | Value Range    | 
+|--------------------|----------------|
+| Number Of Epochs   | 5 - 400        |
+| Learning Rate      | 1e-3 - 1e-40   |
+| Hidden Dimension   | 10 - 60        |
+| Number Of Layers   | 4 - 10         |
+| Virtual Nodes      | True and False |
+| Batch Size         | 64, 128, 256   |
+| Aggregation Type   | SUM, MEAN, MAX |
+
+We found the results were produced by models with a high number of epoches, a learning rate of about 1e-4, 
+a hidden dimension of about 40, about 7 layers, no virtual nodes, a batch size around 128 and with the aggregation type
+set to SUM.
+
+Our final, best model has the following parameters:
+
+| Parameter          | Value Range    | 
+|--------------------|----------------|
+| Number Of Epochs   | 5 - 400        |
+| Learning Rate      | 1e-3 - 1e-40   |
+| Hidden Dimension   | 10 - 60        |
+| Number Of Layers   | 4 - 10         |
+| Virtual Nodes      | True and False |
+| Batch Size         | 64, 128, 256   |
+| Aggregation Type   | SUM, MEAN, MAX |
+
+and the following evaluation scores:
+
+| Dataset | Training MAE   | Validation MAE  | Test MAE    |
+|---------|----------------|-----------------|-------------|
+| ZINC    |                |                 |             |
+
+To load the best model, run the following commands:
+
+```
+model = RNetwork(**config)
+path = os.path.abspath(os.getcwd()) + "/best_model"
+model.load_state_dict(torch.load(path))
 ```
