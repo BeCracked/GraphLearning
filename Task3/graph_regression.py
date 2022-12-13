@@ -17,7 +17,7 @@ QUIET = os.getenv("QUIET", default=True)
 
 def run_graph_regression(train_data_path: str, test_data_path: str, validation_data_path: str, *,
                          device: Optional[str] = None, epochs=10, learning_rate=1e-30,
-                         **config) -> tuple[float, float]:
+                         **config) -> tuple[float, float, float]:
     """
     Performs k-fold cross validation with the graph classification net on the given dataset.
 
@@ -43,7 +43,7 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
     # Load data
     train_loader = get_data_loader(train_data_path, **config)
     test_loader = get_data_loader(test_data_path, **config)
-    validation_loader = get_data_loader(test_data_path, **config)
+    validation_loader = get_data_loader(validation_data_path, **config)
 
     # TODO: Extract node/edge feature dimension
 
@@ -149,5 +149,7 @@ def train_loop(dataloader, model, loss_fn, optimizer):
 if __name__ == '__main__':
     from Task3.configurations import zinc_base_params
 
-    run_graph_regression("datasets/ZINC_Train/data.pkl", "datasets/ZINC_Test/data.pkl", "datasets/ZINC_Val/data.pkl",
+    train_mae, best_val_mae, test_mae = run_graph_regression("datasets/ZINC_Train/data.pkl", "datasets/ZINC_Test/data.pkl", "datasets/ZINC_Val/data.pkl",
                          device="cpu", **zinc_base_params)
+
+
