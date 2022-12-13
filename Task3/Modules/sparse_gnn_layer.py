@@ -20,7 +20,9 @@ class SparseGNNLayer(torch.nn.Module):
 
         self.U = torch.nn.Sequential(
             torch.nn.Linear(U_dim_in, U_dim_out),
-            torch.nn.ReLU())
+            torch.nn.ReLU(),
+            torch.nn.BatchNorm1d(U_dim_out)
+        )
 
         # Dropout probability
         self.drop_prob = drop_prob

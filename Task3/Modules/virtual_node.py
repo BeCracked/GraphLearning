@@ -10,7 +10,8 @@ class VirtualNode(torch.nn.Module):
         # Setup V as trainable MLP
         self.V = torch.nn.Sequential(
             torch.nn.Linear(V_dim_in, V_dim_out),
-            torch.nn.ReLU()
+            torch.nn.ReLU(),
+            torch.nn.BatchNorm1d(V_dim_out)
         )
 
         self.sum_pooling = SparseSumPooling()
