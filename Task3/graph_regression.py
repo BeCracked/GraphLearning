@@ -16,7 +16,7 @@ QUIET = os.getenv("QUIET", default=True)
 
 
 def run_graph_regression(train_data_path: str, test_data_path: str, validation_data_path: str, *,
-                         device: Optional[str] = None, epochs=10, learning_rate=1e-30,
+                         device: Optional[str] = None, epoch_count=10, learning_rate=1e-30,
                          **config) -> tuple[float, float, float]:
     """
     Performs k-fold cross validation with the graph classification net on the given dataset.
@@ -61,7 +61,7 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
     train_mae = val_mae = 0
     best_val_mae = 0
     best_model = None
-    for epoch in tqdm(range(epochs), disable=QUIET):
+    for epoch in tqdm(range(epoch_count)):
         model.train()
         train_mae = train_loop(train_loader, model, loss_fn, opt)  # Consider only accuracy of last epoch
         model.eval()
@@ -151,5 +151,8 @@ if __name__ == '__main__':
 
     train_mae, best_val_mae, test_mae = run_graph_regression("datasets/ZINC_Train/data.pkl", "datasets/ZINC_Test/data.pkl", "datasets/ZINC_Val/data.pkl",
                          device="cpu", **zinc_base_params)
+    print("train:", train_mae)
+    print("val:", best_val_mae)
+    print("test:", test_mae)
 
 
