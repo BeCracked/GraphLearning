@@ -7,23 +7,21 @@ from Modules.virtual_node import VirtualNode
 from Modules.sparse_sum_pooling import SparseSumPooling
 
 
-# noinspection PyPep8Naming
 class RNetwork(torch.nn.Module):
     def __init__(self, node_feature_dimension: int, edge_feature_dimension: int, *,
                  hidden_dim: int, virtual_node: bool, layer_count: int, drop_prob: float = 0, **config):
         """
-        Creates a network of GCN layers.
+        Creates a network of GNN layers with optional virtual node, global pooling and final MLP.
 
         Parameters
         ----------
-        m_dim_in Input dimension of message function M.
-        m_dim_out Output dimension of message function M.
-        u_dim_in Input dimension of update function U.
-        u_dim_out Output dimension of update function U.
-        input_dim Dimension of input layer.
-        output_dim Dimension of output layer.
-        hidden_dim Dimension of hidden layers.
-        virtual_nodes Should virtual nodes be used (yes or no).
+        node_feature_dimension Length of node features (21 in our case).
+        edge_feature_dimension Length of edge features (3 in our case).
+        hidden_dim Hidden dimension that can be optimized.
+        virtual_node Flag whether to use virtual nodes or not.
+        layer_count Number of GNN layers.
+        drop_prob Probability for dropout layers.
+        config Configuration dictionary that may be used in other modules or functions.
 
         Returns
         -------
@@ -59,16 +57,18 @@ class RNetwork(torch.nn.Module):
 
     def forward(self, H: torch.Tensor, Xe: torch.Tensor, id_Xe: torch.Tensor, batch_idx: torch.Tensor):
         """
-        Forward computation of the GCN Network.
+        Forward computation of the network.
 
         Parameters
         ----------
-        x The node feature vectors of each graph.
-        adj_matrices Corresponding normalized adjacency matrices of each graph.
+        H Node feature matrix.
+        Xe Edge feature matrix.
+        id_Xe Directed edge list.
+        batch_idx Index of the original graph for each vertex in the merged graph.
 
         Returns
         -------
-        Full GCN Network.
+        Full regression network.
         """
         # apply layers
         y = self.input_layer(H, Xe, id_Xe)
@@ -82,7 +82,7 @@ class RNetwork(torch.nn.Module):
                 y = self.virtual_nodes[i + 1](y, batch_idx)
         y = self.global_pool(y, batch_idx)
 
-        # Apply MLP Classification
+        # apply MLP
         y = self.MLP(y)
 
         return y
