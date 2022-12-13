@@ -51,15 +51,15 @@ set to SUM.
 
 Our final, best model has the following parameters:
 
-| Parameter          | Value Range    | 
-|--------------------|----------------|
-| Number Of Epochs   | 5 - 400        |
-| Learning Rate      | 1e-3 - 1e-40   |
-| Hidden Dimension   | 10 - 60        |
-| Number Of Layers   | 4 - 10         |
-| Virtual Nodes      | True and False |
-| Batch Size         | 64, 128, 256   |
-| Aggregation Type   | SUM, MEAN, MAX |
+| Parameter          | Value Range | 
+|--------------------|-------------|
+| Number Of Epochs   |             |
+| Learning Rate      |             |
+| Hidden Dimension   |             |
+| Number Of Layers   |             |
+| Virtual Nodes      | False       |
+| Batch Size         | 128         |
+| Aggregation Type   | SUM         |
 
 and the following evaluation scores:
 

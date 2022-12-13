@@ -178,8 +178,6 @@ def train_loop(dataloader, model, loss_fn, optimizer):
 if __name__ == '__main__':
     from configurations import zinc_base_params
 
-    best_score = 100
-    best_params = {}
     print(zinc_base_params)
     train_mae, val_mae, test_mae, e = run_graph_regression("datasets/ZINC_Train/data.pkl",
                                                                         "datasets/ZINC_Test/data.pkl",

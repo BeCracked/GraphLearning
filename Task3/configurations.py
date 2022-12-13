@@ -7,11 +7,11 @@ zinc_base_params = {
     "edge_feature_key": "edge_label",
     "graph_feature_key": "label",
 
-    "hidden_dim": 45,
+    "hidden_dim": 42,
     "aggregation": "SUM",
-    "drop_prob": 0.001,
+    "drop_prob": 0.005,
     "virtual_node": False,
-    "layer_count": 7,
+    "layer_count": 8,
 
     "node_feature_dimension": 21,
     "edge_feature_dimension": 3,
