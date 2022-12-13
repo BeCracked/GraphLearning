@@ -1,22 +1,19 @@
-import pickle
 import networkx as nx
 from typing import List
 
 
 def edge_labels_to_one_hot(graphs: List[nx.Graph], *, edge_feature_key="edge_label") -> List[nx.Graph]:
     """
-
     Parameters
     ----------
-    graphs
-    edge_feature_key
-
+    graphs List of networkx graphs.
+    edge_feature_key Keyword to extract edge labels.
+    
     Returns
     -------
     A copy of graphs with the edge labels transformed to a one hot encoding representation.
-
     """
-    # edge_labels = get_edge_labels(graphs)
+
     # We have edge labels 1, 2, 3
     edge_labels = list(range(1, 4))
     new_graphs = []
@@ -39,18 +36,16 @@ def edge_labels_to_one_hot(graphs: List[nx.Graph], *, edge_feature_key="edge_lab
 
 def node_labels_to_one_hot(graphs: List[nx.Graph], *, node_feature_key="node_label") -> List[nx.Graph]:
     """
-
     Parameters
     ----------
-    graphs
-    node_feature_key
-
+    graphs List of networkx graphs.
+    node_feature_key Keyword to extract node labels.
+    
     Returns
     -------
     A copy of graphs with the node labels transformed to a one hot encoding representation.
-
     """
-    # node_labels = get_node_labels(graphs)
+
     # We have node labels 0 to 20
     node_labels = list(range(21))
     new_graphs = []
@@ -69,10 +64,3 @@ def node_labels_to_one_hot(graphs: List[nx.Graph], *, node_feature_key="node_lab
         new_graphs.append(new_graph)
 
     return new_graphs
-
-
-if __name__ == '__main__':
-    with open("../datasets/ZINC_Train/data.pkl", "rb") as f:
-        data = pickle.load(f)
-
-    edge_labels_to_one_hot(data)

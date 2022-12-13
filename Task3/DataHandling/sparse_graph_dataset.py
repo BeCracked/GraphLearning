@@ -19,6 +19,21 @@ class SparseGraphDataset(Dataset):
                  node_feature_key: str = "node_label", edge_feature_key: Optional[str] = None,
                  graph_feature_key: str | None = "label",
                  **kwargs):
+        """
+        Custom dataset class that constructs a sparse representation of each graph in the dataset.
+
+        Parameters
+        ----------
+        graphs List of networkx graphs.
+        device Which device to use ("cuda" or "cpu").
+        node_feature_key Keyword to extract node labels.
+        edge_feature_key Keyword to extract edge labels.
+        graph_feature_key Keyword to extract graph labels.
+        
+        Returns
+        -------
+        
+        """
         super(SparseGraphDataset, self).__init__()
         self.graph_count = len(graphs)
 
@@ -43,7 +58,6 @@ class SparseGraphDataset(Dataset):
             self.edge_lists[i] = idx
 
             if edge_feature_key:
-                # self.edge_features[i] = torch.tensor(v, device=device).to_sparse_coo()
                 self.edge_features[i] = torch.tensor(v, device=device)
 
             # Graph Labels
@@ -59,7 +73,18 @@ class SparseGraphDataset(Dataset):
 
 
 def sparse_graph_collation(sparse_reps: list[SparseGraphRep]):
-    # edge_features_flag: bool = sparse_reps[0].edge_features is not None and sparse_reps[0].edge_features._nnz() > 0
+    """
+    Merges the list of sparse representation graphs into one graph.
+
+    Parameters
+    ----------
+    sparse_reps List of sparse representation graphs to be merged.
+    
+    Returns
+    -------
+    batch_idx Stores the index of the original graph for each vertex in the merged graph.
+    collated_rep Contains the directed edge list, node feature matrix, edge feature matrix and graph label.
+    """
     edge_features_flag = True
 
     node_features = torch.cat([r.node_features for r in sparse_reps])
@@ -94,21 +119,3 @@ def sparse_graph_collation(sparse_reps: list[SparseGraphRep]):
     collated_rep = SparseGraphRep(edge_list, node_features, edge_features, graph_labels)
 
     return batch_idx, *collated_rep
-
-
-if __name__ == '__main__':
-    import time
-    from Task3.configurations import zinc_base_params
-    from Task3.DataHandling.preprocessing import edge_labels_to_one_hot
-    s = time.perf_counter()
-    path = "../datasets/ZINC_Train/data.pkl"
-    with open(path, 'rb') as f:
-        data = edge_labels_to_one_hot(pickle.load(f))
-
-    dataset = SparseGraphDataset(data, **zinc_base_params)
-    dl = DataLoader(dataset, collate_fn=sparse_graph_collation, batch_size=10)
-
-    e = time.perf_counter()
-
-    print(f"Took {e-s}")
-    print(dl)
