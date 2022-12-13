@@ -185,36 +185,4 @@ if __name__ == '__main__':
                                                                         "datasets/ZINC_Test/data.pkl",
                                                                          "datasets/ZINC_Val/data.pkl",
                                                                          device="cpu", **zinc_base_params)
-    print(train_mae, test_mae, test_mae)
-    """
-    for vnode in [False]:
-        for aggregation in ["SUM"]:
-            for hidden_dim in [40]:
-                for layer_count in [7]:
-                    for lear_rate in [1e-3]:
-                        for batchsize in [128]:
-                            for drop_prob in [0.005]:
-                                # print(f"dim {hidden_dim}, layer count {layer_count}, learning rate {lear_rate}")
-                                zinc_base_params["hidden_dim"] = hidden_dim
-                                zinc_base_params["aggregation"] = aggregation
-                                zinc_base_params["drop_prob"] = drop_prob
-                                zinc_base_params["virtual_node"] = vnode
-                                zinc_base_params["learning_rate"] = lear_rate
-                                zinc_base_params["batch_size"] = batchsize
-                                train_mae, best_val_mae, val_mae, test_mae, e = run_graph_regression(
-                                    "datasets/ZINC_Train/data.pkl",
-                                    "datasets/ZINC_Test/data.pkl",
-                                    "datasets/ZINC_Val/data.pkl",
-                                    device="cpu", **zinc_base_params)
-
-                                if test_mae < best_score:
-                                    best_score = test_mae
-                                    best_params = zinc_base_params
-
-                                    print("9: best score: ", train_mae, best_val_mae, val_mae, test_mae)
-                                    print(f"with params {best_params} and {e} epochs")
-
-        print("best overall score: ", best_score)
-        print(f"with params {best_params}")
-
-    """
+    print(train_mae, val_mae, test_mae)
