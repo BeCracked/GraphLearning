@@ -7,16 +7,16 @@ zinc_base_params = {
     "edge_feature_key": "edge_label",
     "graph_feature_key": "label",
 
-    "hidden_dim": 50,
+    "hidden_dim": 45,
     "aggregation": "SUM",
-    "drop_prob": 0.1,
+    "drop_prob": 0.001,
     "virtual_node": False,
     "layer_count": 7,
 
     "node_feature_dimension": 21,
     "edge_feature_dimension": 3,
 
-    "epoch_count": 50,
-    "learning_rate": 1e-5,
+    "epoch_count": 400,
+    "learning_rate": 1e-3,
     "batch_size": 128
 }

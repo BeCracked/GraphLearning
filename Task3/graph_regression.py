@@ -17,7 +17,7 @@ QUIET = os.getenv("QUIET", default=True)
 
 def run_graph_regression(train_data_path: str, test_data_path: str, validation_data_path: str, *,
                          device: Optional[str] = None, epoch_count=10, learning_rate=1e-30,
-                         **config) -> tuple[float, float, float]:
+                         **config) -> tuple[float, float, float, float]:
     """
     Performs graph regression on the given training, validation and test dataset.
 
@@ -61,6 +61,7 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
     path = os.path.abspath(os.getcwd()) + "/best_model"
 
     foo = False
+    best_number_of_epochs = 0
     for epoch in tqdm(range(epoch_count)):
         model.train()
         train_mae = train_loop(train_loader, model, loss_fn, opt)  # Consider only accuracy of last epoch
@@ -68,26 +69,33 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
         val_mae = validation(validation_loader, model, loss_fn)
         if best_val_mae == 0:
             best_val_mae = val_mae
-            best_model = model.state_dict()
-        elif val_mae < best_val_mae:
-            best_val_mae = val_mae
             torch.save(model.state_dict(), path)
+        elif val_mae < best_val_mae:
+            print(val_mae)
+            path2 = os.path.abspath(os.getcwd()) + "/best_model"
+            best_val_mae = val_mae
+            torch.save(model.state_dict(), path2)
             foo = True
+            best_number_of_epochs = epoch
+        elif val_mae < best_val_mae + 0.001:
+            path2 = os.path.abspath(os.getcwd()) + "/best_model" + str(epoch)
+            best_val_mae = val_mae
+            torch.save(model.state_dict(), path2)
     if foo:
         selected_model = RNetwork(**config)
-        selected_model.load_state_dict(torch.load(path))
+        path3 = os.path.abspath(os.getcwd()) + "/best_model"
+        selected_model.load_state_dict(torch.load(path3))
     else:
         selected_model = model
-    
+
     selected_model.eval()
     test_mae = validation(test_loader, selected_model, loss_fn)
     val_mae = validation(validation_loader, selected_model, loss_fn)
     train_mae = train_loop(train_loader, selected_model, loss_fn, opt)
 
     model.eval()
-    test_mae = validation(test_loader, model, loss_fn)
-
-    return train_mae, best_val_mae, test_mae
+    print(" test mae: ", test_mae)
+    return train_mae, val_mae, test_mae, best_number_of_epochs
 
 
 def validation(dataloader, model, loss_fn):
@@ -160,9 +168,9 @@ def train_loop(dataloader, model, loss_fn, optimizer):
         y_pred = model(H, x_E, idx_E, batch_idx)
         # to remove unnecessary dimension
         y_pred = torch.squeeze(y_pred)
-        
+
         loss = loss_fn(y_pred, y_train)
-        
+
         absolute_error_sum += loss
         # Backward pass and sgd step
         loss.backward()
@@ -173,36 +181,44 @@ def train_loop(dataloader, model, loss_fn, optimizer):
 
 if __name__ == '__main__':
     from configurations import zinc_base_params
+
     best_score = 100
     best_params = {}
-
-    for vnode in [False, True]:
-        for aggregation in ["SUM", "MEAN", "MAX"]:
-            for hidden_dim in [10, 20, 40, 60]:
-                for layer_count in [7, 8]:
-                    for lear_rate in [1e-3, 1e-5]:
+    print(zinc_base_params)
+    train_mae, val_mae, test_mae, e = run_graph_regression("datasets/ZINC_Train/data.pkl",
+                                                                        "datasets/ZINC_Test/data.pkl",
+                                                                         "datasets/ZINC_Val/data.pkl",
+                                                                         device="cpu", **zinc_base_params)
+    print(train_mae, test_mae, test_mae)
+    """
+    for vnode in [False]:
+        for aggregation in ["SUM"]:
+            for hidden_dim in [40]:
+                for layer_count in [7]:
+                    for lear_rate in [1e-3]:
                         for batchsize in [128]:
-                            for drop_prob in [0, 0.005]:
+                            for drop_prob in [0.005]:
+                                # print(f"dim {hidden_dim}, layer count {layer_count}, learning rate {lear_rate}")
                                 zinc_base_params["hidden_dim"] = hidden_dim
                                 zinc_base_params["aggregation"] = aggregation
                                 zinc_base_params["drop_prob"] = drop_prob
                                 zinc_base_params["virtual_node"] = vnode
                                 zinc_base_params["learning_rate"] = lear_rate
                                 zinc_base_params["batch_size"] = batchsize
-                                train_mae, best_val_mae, test_mae = run_graph_regression("datasets/ZINC_Train/data.pkl",
-                                                                                    "datasets/ZINC_Test/data.pkl",
-                                                                                    "datasets/ZINC_Val/data.pkl",
-                                                                                    device="cpu", **zinc_base_params)
+                                train_mae, best_val_mae, val_mae, test_mae, e = run_graph_regression(
+                                    "datasets/ZINC_Train/data.pkl",
+                                    "datasets/ZINC_Test/data.pkl",
+                                    "datasets/ZINC_Val/data.pkl",
+                                    device="cpu", **zinc_base_params)
+
                                 if test_mae < best_score:
                                     best_score = test_mae
                                     best_params = zinc_base_params
 
-                                    print("9: best score: ", best_score)
-                                    print(f"with params {best_params}")
+                                    print("9: best score: ", train_mae, best_val_mae, val_mae, test_mae)
+                                    print(f"with params {best_params} and {e} epochs")
 
-                        print("learn rate: ", lear_rate)
-
-                print("hidden dim: ", hidden_dim)
-    
         print("best overall score: ", best_score)
         print(f"with params {best_params}")
+
+    """
