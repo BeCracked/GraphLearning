@@ -19,22 +19,21 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
                          device: Optional[str] = None, epoch_count=10, learning_rate=1e-30,
                          **config) -> tuple[float, float, float]:
     """
-    Performs k-fold cross validation with the graph classification net on the given dataset.
+    Performs graph regression on the given training, validation and test dataset.
 
     Parameters
     ----------
-    path The path to the dataset file.
-    dataset_name Name of the dataset to use. Either "NCI" or "ENZYMES". Determines certain import behaviour.
+    train_data_path The path to the training dataset file.
+    test_data_path The path to the test dataset file.
+    validation_data_path The path to the validation dataset file.
     device The device name to run on.
-    epochs Number of epochs to train for.
-    batch_size Batch sizes for the DataLoaders to use.
+    epoch_count Number of epochs to train for.
     learning_rate Learning rate to use by the optimizer.
     config Configuration dictionary that may be used in other modules or functions.
 
     Returns
     -------
-    The train and test accuracy
-    Tuple of Lists of the form (train_accs, train_stds, test_accs, test_stds).
+    The train, validation and test mean absolute error.
     """
     torch.manual_seed(42)
     if not device:
@@ -44,8 +43,6 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
     train_loader = get_data_loader(train_data_path, **config)
     test_loader = get_data_loader(test_data_path, **config)
     validation_loader = get_data_loader(validation_data_path, **config)
-
-    # TODO: Extract node/edge feature dimension
 
     # Create model
     model = RNetwork(**config)
@@ -62,12 +59,11 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
     best_val_mae = 0
     best_model = None
     path = os.path.abspath(os.getcwd()) + "/best_model"
-    # print("path: ", path)
+
     foo = False
     for epoch in tqdm(range(epoch_count)):
         model.train()
         train_mae = train_loop(train_loader, model, loss_fn, opt)  # Consider only accuracy of last epoch
-        # print(train_mae)
         model.eval()
         val_mae = validation(validation_loader, model, loss_fn)
         if best_val_mae == 0:
@@ -82,11 +78,11 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
         selected_model.load_state_dict(torch.load(path))
     else:
         selected_model = model
+    
     selected_model.eval()
     test_mae = validation(test_loader, selected_model, loss_fn)
     val_mae = validation(validation_loader, selected_model, loss_fn)
     train_mae = train_loop(train_loader, selected_model, loss_fn, opt)
-    # print(train_mae, best_val_mae, val_mae, test_mae)
 
     model.eval()
     test_mae = validation(test_loader, model, loss_fn)
@@ -95,6 +91,19 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
 
 
 def validation(dataloader, model, loss_fn):
+    """
+    Validates/Tests the trained model.
+
+    Parameters
+    ----------
+    dataloader Data of validation or test dataset.
+    model Trained model to be validated/tested.
+    loss_fn Calculates the absolute error (l1-loss).
+
+    Returns
+    -------
+    The validation/test mean absolute error.
+    """
     absolute_error = 0
     for batch, (batch_idx, idx_E, H, x_E, y_train) in enumerate(dataloader):
         y_pred = model(H, x_E, idx_E, batch_idx)
@@ -108,15 +117,15 @@ def validation(dataloader, model, loss_fn):
 
 def get_data_loader(path: str, *, batch_size: int = 128, **config) -> DataLoader:
     """
-    Load graphs of dataset, apply normalization to adjacency matrices and extract labels.
+    Loads graphs of dataset, applies one hot transformation of node and edge labels.
     ----------
-    path The path to the dataset
+    path The path to the dataset.
+    batch_size Size of the batch.
     config Configuration dictionary that may be used in other modules or functions.
 
     Returns
     -------
-    Node Feature Embeddings and normalized matrices as Tensors.
-    Labels as Tensors and number of labels.
+    Dataloader with the prepared dataset for the graph regression.
     """
     with open(path, 'rb') as f:
         data = preprocessing.edge_labels_to_one_hot(pickle.load(f))
@@ -134,32 +143,31 @@ def train_loop(dataloader, model, loss_fn, optimizer):
 
     Parameters
     ----------
-    dataloader The dataloader to use. Needs to provide x: node embeddings, a: normalized adjacency matrices, y: labels.
+    dataloader The dataloader to use.
     model The model to train.
-    loss_fn The loss function to use. E.g., torch.nn.functional.cross_entropy.
-    optimizer The optimizer to use. E.g., torch.optim.Adam(model.parameters(), lr=learning_rate).
+    loss_fn The loss function to use (l1-loss in our case).
+    optimizer The optimizer to use. (Adam in our case).
 
     Returns
     -------
-    The list of accuracy values for each batch.
+    The training mean absolute error.
     """
     absolute_error_sum = 0
     for batch, (batch_idx, idx_E, H, x_E, y_train) in enumerate(dataloader):
         # Set gradients to zero
         optimizer.zero_grad()
-
         # Forward pass and loss
         y_pred = model(H, x_E, idx_E, batch_idx)
         # to remove unnecessary dimension
         y_pred = torch.squeeze(y_pred)
+        
         loss = loss_fn(y_pred, y_train)
-        # print(f"loss: {loss}")
+        
         absolute_error_sum += loss
         # Backward pass and sgd step
         loss.backward()
         optimizer.step()
-    # print(f"aboslute error is {absolute_error_sum} and the len of dataloader is {len(dataloader)}")
-    # print(f"thus, the mae is {abs(absolute_error_sum / len(dataloader))}")
+
     return abs(absolute_error_sum / len(dataloader))
 
 
@@ -168,13 +176,6 @@ if __name__ == '__main__':
     best_score = 100
     best_params = {}
 
-    """
-    train_mae, best_val_mae, test_mae = run_graph_regression("datasets/ZINC_Train/data.pkl",
-                                                             "datasets/ZINC_Test/data.pkl",
-                                                             "datasets/ZINC_Val/data.pkl",
-                                                             device="cpu", **zinc_base_params)
-    print(train_mae, best_val_mae, test_mae)
-    """
     for vnode in [False, True]:
         for aggregation in ["SUM", "MEAN", "MAX"]:
             for hidden_dim in [10, 20, 40, 60]:
@@ -182,7 +183,6 @@ if __name__ == '__main__':
                     for lear_rate in [1e-3, 1e-5]:
                         for batchsize in [128]:
                             for drop_prob in [0, 0.005]:
-                                # print(f"dim {hidden_dim}, layer count {layer_count}, learning rate {lear_rate}")
                                 zinc_base_params["hidden_dim"] = hidden_dim
                                 zinc_base_params["aggregation"] = aggregation
                                 zinc_base_params["drop_prob"] = drop_prob
@@ -203,9 +203,6 @@ if __name__ == '__main__':
                         print("learn rate: ", lear_rate)
 
                 print("hidden dim: ", hidden_dim)
-
-    
-    
     
         print("best overall score: ", best_score)
         print(f"with params {best_params}")
