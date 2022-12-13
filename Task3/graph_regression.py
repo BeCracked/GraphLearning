@@ -61,9 +61,13 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
     train_mae = val_mae = 0
     best_val_mae = 0
     best_model = None
+    path = os.path.abspath(os.getcwd()) + "/best_model"
+    # print("path: ", path)
+    foo = False
     for epoch in tqdm(range(epoch_count)):
         model.train()
         train_mae = train_loop(train_loader, model, loss_fn, opt)  # Consider only accuracy of last epoch
+        # print(train_mae)
         model.eval()
         val_mae = validation(validation_loader, model, loss_fn)
         if best_val_mae == 0:
@@ -71,7 +75,18 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
             best_model = model.state_dict()
         elif val_mae < best_val_mae:
             best_val_mae = val_mae
-            best_model = model.state_dict()
+            torch.save(model.state_dict(), path)
+            foo = True
+    if foo:
+        selected_model = RNetwork(**config)
+        selected_model.load_state_dict(torch.load(path))
+    else:
+        selected_model = model
+    selected_model.eval()
+    test_mae = validation(test_loader, selected_model, loss_fn)
+    val_mae = validation(validation_loader, selected_model, loss_fn)
+    train_mae = train_loop(train_loader, selected_model, loss_fn, opt)
+    # print(train_mae, best_val_mae, val_mae, test_mae)
 
     model.eval()
     test_mae = validation(test_loader, model, loss_fn)
@@ -128,7 +143,7 @@ def train_loop(dataloader, model, loss_fn, optimizer):
     -------
     The list of accuracy values for each batch.
     """
-    absolute_error = 0
+    absolute_error_sum = 0
     for batch, (batch_idx, idx_E, H, x_E, y_train) in enumerate(dataloader):
         # Set gradients to zero
         optimizer.zero_grad()
@@ -138,21 +153,59 @@ def train_loop(dataloader, model, loss_fn, optimizer):
         # to remove unnecessary dimension
         y_pred = torch.squeeze(y_pred)
         loss = loss_fn(y_pred, y_train)
-        absolute_error += loss
+        # print(f"loss: {loss}")
+        absolute_error_sum += loss
         # Backward pass and sgd step
         loss.backward()
         optimizer.step()
-
-    return abs(absolute_error / len(dataloader))
+    # print(f"aboslute error is {absolute_error_sum} and the len of dataloader is {len(dataloader)}")
+    # print(f"thus, the mae is {abs(absolute_error_sum / len(dataloader))}")
+    return abs(absolute_error_sum / len(dataloader))
 
 
 if __name__ == '__main__':
-    from Task3.configurations import zinc_base_params
+    from configurations import zinc_base_params
+    best_score = 100
+    best_params = {}
 
-    train_mae, best_val_mae, test_mae = run_graph_regression("datasets/ZINC_Train/data.pkl", "datasets/ZINC_Test/data.pkl", "datasets/ZINC_Val/data.pkl",
-                         device="cpu", **zinc_base_params)
-    print("train:", train_mae)
-    print("val:", best_val_mae)
-    print("test:", test_mae)
+    """
+    train_mae, best_val_mae, test_mae = run_graph_regression("datasets/ZINC_Train/data.pkl",
+                                                             "datasets/ZINC_Test/data.pkl",
+                                                             "datasets/ZINC_Val/data.pkl",
+                                                             device="cpu", **zinc_base_params)
+    print(train_mae, best_val_mae, test_mae)
+    """
+    for vnode in [False, True]:
+        for aggregation in ["SUM", "MEAN", "MAX"]:
+            for hidden_dim in [10, 20, 40, 60]:
+                for layer_count in [7, 8]:
+                    for lear_rate in [1e-3, 1e-5]:
+                        for batchsize in [128]:
+                            for drop_prob in [0, 0.005]:
+                                # print(f"dim {hidden_dim}, layer count {layer_count}, learning rate {lear_rate}")
+                                zinc_base_params["hidden_dim"] = hidden_dim
+                                zinc_base_params["aggregation"] = aggregation
+                                zinc_base_params["drop_prob"] = drop_prob
+                                zinc_base_params["virtual_node"] = vnode
+                                zinc_base_params["learning_rate"] = lear_rate
+                                zinc_base_params["batch_size"] = batchsize
+                                train_mae, best_val_mae, test_mae = run_graph_regression("datasets/ZINC_Train/data.pkl",
+                                                                                    "datasets/ZINC_Test/data.pkl",
+                                                                                    "datasets/ZINC_Val/data.pkl",
+                                                                                    device="cpu", **zinc_base_params)
+                                if test_mae < best_score:
+                                    best_score = test_mae
+                                    best_params = zinc_base_params
 
+                                    print("9: best score: ", best_score)
+                                    print(f"with params {best_params}")
 
+                        print("learn rate: ", lear_rate)
+
+                print("hidden dim: ", hidden_dim)
+
+    
+    
+    
+        print("best overall score: ", best_score)
+        print(f"with params {best_params}")

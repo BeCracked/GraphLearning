@@ -1,9 +1,10 @@
 import torch
+import torch_scatter
 
 
-from Task3.Modules.sparse_gnn_layer import SparseGNNLayer
-from Task3.Modules.virtual_node import VirtualNode
-from Task3.Modules.sparse_sum_pooling import SparseSumPooling
+from Modules.sparse_gnn_layer import SparseGNNLayer
+from Modules.virtual_node import VirtualNode
+from Modules.sparse_sum_pooling import SparseSumPooling
 
 
 # noinspection PyPep8Naming
