@@ -45,7 +45,7 @@ For each hyperparameter we evaluated values within the following ranges:
 | Batch Size         | 64, 128, 256   |
 | Aggregation Type   | SUM, MEAN, MAX |
 
-We found the results were produced by models with a high number of epoches, a learning rate of about 1e-4, 
+We found the best results were produced by models with a high number of epochs, a learning rate of about 1e-4, 
 a hidden dimension of about 40, about 7 layers, no virtual nodes, a batch size around 128 and with the aggregation type
 set to SUM.
 
@@ -53,19 +53,19 @@ Our final, best model has the following parameters:
 
 | Parameter          | Value Range | 
 |--------------------|-------------|
-| Number Of Epochs   |             |
-| Learning Rate      |             |
-| Hidden Dimension   |             |
-| Number Of Layers   |             |
+| Number Of Epochs   | 400         |
+| Learning Rate      | 1e-3        |
+| Hidden Dimension   | 45          |
+| Number Of Layers   | 7           |
 | Virtual Nodes      | False       |
 | Batch Size         | 128         |
 | Aggregation Type   | SUM         |
 
 and the following evaluation scores:
 
-| Dataset | Training MAE   | Validation MAE  | Test MAE    |
-|---------|----------------|-----------------|-------------|
-| ZINC    |                |                 |             |
+| Dataset | Training MAE | Validation MAE | Test MAE |
+|---------|--------------|----------------|----------|
+| ZINC    | 0.1328       | 0.2345         | 0.2116   |
 
 To load the best model, run the following commands:
 

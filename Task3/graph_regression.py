@@ -59,7 +59,7 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
     best_val_mae = 0
     best_model = None
     path = os.path.abspath(os.getcwd()) + "/best_model"
-
+    c = 0
     foo = False
     best_number_of_epochs = 0
     for epoch in tqdm(range(epoch_count)):
@@ -71,12 +71,17 @@ def run_graph_regression(train_data_path: str, test_data_path: str, validation_d
             best_val_mae = val_mae
             torch.save(model.state_dict(), path)
         elif val_mae < best_val_mae:
-            print(val_mae)
             path2 = os.path.abspath(os.getcwd()) + "/best_model"
             best_val_mae = val_mae
             torch.save(model.state_dict(), path2)
             foo = True
             best_number_of_epochs = epoch
+            c += 1
+
+        if (c % 10) == 0:
+            test_mae = validation(test_loader, model, loss_fn)
+            print("validation error: ", val_mae, "test error: ", test_mae)
+
     if foo:
         selected_model = RNetwork(**config)
         path3 = os.path.abspath(os.getcwd()) + "/best_model"
